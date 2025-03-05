@@ -16,15 +16,18 @@ export default async function RootLayout() {
 
   return (
     <html>
-      <body >
+      
         <header>
           <nav>
             <h1>Tienda en desarrollo</h1>
             <input type="text" id="texto" name="texto" placeholder="Busca aqui..." />
-            <h3><Link href="/"><IoPersonCircle/>Mi cuenta</Link><p></p><Link href="/"><FaBasketShopping/>Mi cesta</Link></h3>
-          </nav>
-        </header>
-        <div className="divC"><Carrusel/></div>
+            <h3><Link href="/"><IoPersonCircle/>Mi cuenta</Link><p>
+              </p><Link href="/"><FaBasketShopping/>Mi cesta</Link></h3>
+          </nav></header>
+         <main><aside>
+            <h2>prueba</h2>
+          </aside></main>
+        <body><div><Carrusel/></div>
         <div>
         {libros.map((libro) => (
           <Link href={`/bibliotecatic/libros/${libro.id}`} key={libro.id}>

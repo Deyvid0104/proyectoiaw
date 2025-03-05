@@ -22,6 +22,15 @@ input{
   justify-content: center;
   align-items: center;
 }
+aside{
+  width:20%;
+  height: 400px;
+  background-color:yellowgreen;
+  display: flex;
+  flex: row nowrap;
+  justify-content: left;
+  align-items: left;
+}
 body {
   max-width: 100vw;
   overflow-x: hidden;
