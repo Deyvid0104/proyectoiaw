@@ -1,0 +1,17 @@
+div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.carrusel-img{
+    width: 200%;
+    height: 200%;
+}
+img{
+    height: 200px;
+    width: 500px;
+}
+.carousel-container {
+    margin-bottom: 30px;
+  }
+  
