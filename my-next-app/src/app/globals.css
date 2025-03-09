@@ -1,8 +1,9 @@
 header{
-  background-color: aqua;
+  background-color: #1a1a1a;
   padding: 30px;
 }
 nav{
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -35,30 +36,26 @@ input{
   margin: 0;
 }
 #dropdown-basic {
-  background-color: #28a745; 
-  color: white;
-  border-radius: 5px;
+  background-color: #000000; 
+  color: rgb(247, 247, 247);
   width: 300px;
-  height: auto;
+  height: 70px;
   display: flex;
   flex: row nowrap;
   justify-content: center;
   align-items: center;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 200px;
+  margin-bottom: 180px;
 
 }
 
 #dropdown-basic:hover {
-  background-color: #218838;
+  background-color: #37adca;
   width: 300px;
 }
 
 
 .dropdown-item button {
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   color: #007bff;
   border: none;
   padding: 10px 15px;
@@ -76,7 +73,7 @@ main section{
 main aside{
   width:20%;
   height: 45vh;
-  background-color:yellowgreen;
+  background-color: #ffffff;
   display: flex;
   flex: row nowrap;
   justify-content: left;
@@ -98,17 +95,12 @@ main{
   gap: 15px;
   text-decoration: none;
 }
-.autor{
-  margin: 0 70px;
+.divC {
+  margin-bottom: 3rem;
 }
-.top_autor{
-  margin-bottom: 100px;
+.link_about{
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.card {
-  border: 3px solid black;
-  padding: 20px;
-  width: 400px;
+  text-decoration: none;
 }

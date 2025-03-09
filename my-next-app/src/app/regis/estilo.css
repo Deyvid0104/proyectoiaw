@@ -1,4 +1,4 @@
-.body_login {
+.body_regis {
     margin: 0;
     height: 100vh;
     display: flex;
@@ -6,7 +6,7 @@
     background-color: rgb(173, 243, 224);
 }
 
-.login {
+.regis {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -35,11 +35,11 @@ input {
     margin-bottom: 30px;
 }
 
-.h1_login {
+.h1_regis {
     margin-bottom: 50px;
 }
 
-.but_login {
+.but_regis {
     background-color: #28a745;
     color: white;
     font-size: 18px;
