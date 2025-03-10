@@ -42,6 +42,7 @@ export default function Home() {
       </aside><section><div className="divC">
           <Carrusel />
         </div></section></main>
+        <footer><h2 className="link_about"><Link href="./about">Nuestro equipo</Link></h2></footer>
     </div>
   );
 }

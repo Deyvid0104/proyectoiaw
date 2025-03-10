@@ -1,8 +1,9 @@
-header{
-  background-color: #1a1a1a;
+header {
+  background-color: #000000;
   padding: 30px;
 }
-nav{
+
+nav {
   color: #fff;
   display: flex;
   align-items: center;
@@ -10,7 +11,8 @@ nav{
   gap: 15px;
   text-decoration: none;
 }
-input{
+
+input {
   padding: 10px;
   width: 300px;
   font-size: 16px;
@@ -18,14 +20,15 @@ input{
   border-radius: 5px;
   margin-bottom: 30px;
 }
-.div1{
+
+.div1 {
   display: flex;
   flex: row nowrap;
   justify-content: center;
   align-items: center;
 }
 
-.product-img{
+.product-img {
   width: 50%;
   height: auto;
 }
@@ -35,8 +38,9 @@ input{
   padding: 0;
   margin: 0;
 }
+
 #dropdown-basic {
-  background-color: #000000; 
+  background-color: #000000;
   color: rgb(247, 247, 247);
   width: 300px;
   height: 70px;
@@ -60,18 +64,20 @@ input{
   border: none;
   padding: 10px 15px;
   text-align: left;
-  width: 265px; 
+  width: 265px;
 }
 
 .dropdown-item button:hover {
   background-color: #e2e6ea;
   color: #0056b3;
 }
-main section{
-  width:80%;
+
+main section {
+  width: 80%;
 }
-main aside{
-  width:20%;
+
+main aside {
+  width: 20%;
   height: 45vh;
   background-color: #ffffff;
   display: flex;
@@ -82,25 +88,45 @@ main aside{
   flex-direction: column;
   gap: 10px;
 }
-main{
-    height:500px;
-    width:100%;
-    display:flex;
-    flex:row nowrap;
+
+main {
+  height: 500px;
+  width: 100%;
+  display: flex;
+  flex: row nowrap;
+  flex: 1;
+  padding: 20px;
 }
-.about{
+
+.about {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 15px;
   text-decoration: none;
 }
+
 .divC {
   margin-bottom: 3rem;
 }
-.link_about{
+
+.link_about {
   display: flex;
   align-items: center;
   justify-content: center;
-  text-decoration: none;
+}
+
+footer {
+  height: 70px;
+  background-color: #333;
+  text-align: center;
+  position: relative;
+  bottom: 0;
+  width: 100%
+}
+
+.global{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }

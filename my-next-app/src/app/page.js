@@ -8,10 +8,10 @@ import Carrusel from "./carrusel/page";
 
 export default function Home() {
   return (
-    <div>
+    <div className="global">
       <header>
         <nav>
-          <h1>Tienda en desarrollo</h1>
+          <h1>TechStore</h1>
           <input type="text" id="texto" name="texto" placeholder="Busca aqui..." />
           <h3><Link href="./login"><IoPersonCircle />Login</Link><p></p>
           <Link href="./regis"><IoPersonCircle />Registrer</Link></h3>
@@ -39,10 +39,11 @@ export default function Home() {
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
-        <h2 className="link_about"><Link href="./about">About</Link></h2>
+        
       </aside><section><div className="divC">
           <Carrusel />
         </div></section></main>
+        <footer><h2 className="link_about"><Link href="./about">Nuestro equipo</Link></h2></footer>
     </div>
   );
 }

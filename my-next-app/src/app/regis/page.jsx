@@ -11,7 +11,7 @@ export default function page() {
         <input type="text" id="texto" name="texto" placeholder="Email" />
         <input type="password" id="texto" name="texto" placeholder="contraseña" />
         <input type="password" id="texto" name="texto" placeholder="Repetir contraseña" />
-        <p></p><button className='but_regis'>Register</button>
+        <p></p><a href='../cesta/usuario'><button className='but_regis'>Register</button></a>
         </Card>
     </div>
     </div>
