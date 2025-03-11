@@ -1,20 +1,30 @@
 'use client'
 import Link from "next/link";
-import "./globals.css";
+import "../../globals.css";
 import { IoPersonCircle } from "react-icons/io5";
 import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Carrusel from "./carrusel/page";
 
 export default function Home() {
   return (
     <div className="global">
       <header>
         <nav>
-          <a href="/" className="inicio"><h1>TechStore</h1></a>
+        <a href="/" className="inicio"><h1>TechStore</h1></a>
           <input type="text" id="texto" name="texto" placeholder="Busca aqui..." />
-          <h3><Link href="./login"><IoPersonCircle />Login</Link><p></p>
-          <Link href="./regis"><IoPersonCircle />Registrer</Link></h3>
+          <h3><Link href="/"><IoPersonCircle />Cerrar sesión</Link></h3>
+          <h3><Dropdown>
+          <Dropdown.Toggle variant="success" id="cesta-basic">
+            <h4>Mi cesta</h4>
+          </Dropdown.Toggle>
+          <Dropdown.Menu id="cesta-menu">
+            <Dropdown.Item>
+              <button >
+                Ordenadores
+              </button>
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown></h3>
         </nav></header>
       <main><aside>
         <Dropdown>
@@ -22,17 +32,17 @@ export default function Home() {
             Categoría
           </Dropdown.Toggle>
           <Dropdown.Menu id="dropdown-menu">
-            <Dropdown.Item href="./categoria/ordenadores">
+            <Dropdown.Item>
               <button >
                 Ordenadores
               </button>
             </Dropdown.Item>
-            <Dropdown.Item href="./categoria/moviles">
+            <Dropdown.Item>
               <button >
                 Moviles
               </button>
             </Dropdown.Item>
-            <Dropdown.Item href="./categoria/componentes">
+            <Dropdown.Item>
               <button >
                 Componentes
               </button>
@@ -41,9 +51,8 @@ export default function Home() {
         </Dropdown>
         
       </aside><section><div className="divC">
-          <Carrusel />
         </div></section></main>
-        <footer><h2 className="link_about"><Link href="./about">Nuestro equipo</Link></h2></footer>
+        <footer><h2 className="link_about"><Link href="../../about">Nuestro equipo</Link></h2></footer>
     </div>
   );
 }

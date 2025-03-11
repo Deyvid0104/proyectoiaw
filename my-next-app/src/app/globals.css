@@ -118,7 +118,7 @@ main {
 
 footer {
   height: 70px;
-  background-color: #333;
+  background-color: #000000;
   text-align: center;
   position: relative;
   bottom: 0;
@@ -129,4 +129,18 @@ footer {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+#cesta-basic {
+  background-color: #000000;
+  color: rgb(247, 247, 247);
+  border: none;
+}
+#cesta-menu{
+  width: 100px;
+}
+
+.inicio{
+  text-decoration: none;
+  color: white;
 }

@@ -10,10 +10,21 @@ export default function Home() {
     <div>
       <header>
         <nav>
-          <h1>TechStore</h1>
+        <a href="/" className="inicio"><h1>TechStore</h1></a>
           <input type="text" id="texto" name="texto" placeholder="Busca aqui..." />
           <h3><Link href="/"><IoPersonCircle />Cerrar sesión</Link></h3>
-          <h3><Link href="../../cesta"><IoPersonCircle />Mi cesta</Link></h3>
+          <h3><Dropdown>
+          <Dropdown.Toggle variant="success" id="cesta-basic">
+            <h4>Mi cesta</h4>
+          </Dropdown.Toggle>
+          <Dropdown.Menu id="cesta-menu">
+            <Dropdown.Item>
+              <button >
+                Ordenadores
+              </button>
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown></h3>
         </nav></header>
       <main><aside>
         <Dropdown>
@@ -21,19 +32,19 @@ export default function Home() {
             Categoría
           </Dropdown.Toggle>
           <Dropdown.Menu id="dropdown-menu">
-            <Dropdown.Item>
+            <Dropdown.Item href="./categoria usuario/ordenadores">
               <button >
                 Ordenadores
               </button>
             </Dropdown.Item>
-            <Dropdown.Item>
+            <Dropdown.Item href="./categoria usuario/moviles">
               <button >
                 Moviles
               </button>
             </Dropdown.Item>
-            <Dropdown.Item>
+            <Dropdown.Item href="./categoria usuario/componentes">
               <button >
-                Teléfonos
+                Componentes
               </button>
             </Dropdown.Item>
           </Dropdown.Menu>
@@ -42,6 +53,7 @@ export default function Home() {
       </aside><section><div className="divC">
           <Carrusel />
         </div></section></main>
+        <footer><h2 className="link_about"><Link href="../../about">Nuestro equipo</Link></h2></footer>
     </div>
   );
 }
