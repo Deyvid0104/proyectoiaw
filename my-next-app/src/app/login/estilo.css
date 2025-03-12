@@ -15,9 +15,10 @@
 }
 
 .card {
-    border: 3px solid black;
+    border: 1px solid black;
     padding: 20px;
     width: 400px;
+    background-color: white;
 }
 
 input {

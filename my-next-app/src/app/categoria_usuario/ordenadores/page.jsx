@@ -10,7 +10,7 @@ export default function Home() {
     <div className="global">
       <header>
         <nav>
-        <a href="/" className="inicio"><h1>TechStore</h1></a>
+        <a href="../cesta/usuario" className="inicio"><h1>TechStore</h1></a>
           <input type="text" id="texto" name="texto" placeholder="Busca aqui..." />
           <h3><Link href="/"><IoPersonCircle />Cerrar sesión</Link></h3>
           <h3><Dropdown>
@@ -20,7 +20,7 @@ export default function Home() {
           <Dropdown.Menu id="cesta-menu">
             <Dropdown.Item>
               <button >
-                Ordenadores
+                Productos
               </button>
             </Dropdown.Item>
           </Dropdown.Menu>
@@ -32,17 +32,17 @@ export default function Home() {
             Categoría
           </Dropdown.Toggle>
           <Dropdown.Menu id="dropdown-menu">
-            <Dropdown.Item>
+            <Dropdown.Item >
               <button >
                 Ordenadores
               </button>
             </Dropdown.Item>
-            <Dropdown.Item>
+            <Dropdown.Item href="../categoria_usuario/moviles">
               <button >
                 Moviles
               </button>
             </Dropdown.Item>
-            <Dropdown.Item>
+            <Dropdown.Item href="../categoria_usuario/componentes">
               <button >
                 Componentes
               </button>

@@ -12,7 +12,7 @@ export default function Home() {
         <nav>
         <a href="/" className="inicio"><h1>TechStore</h1></a>
           <input type="text" id="texto" name="texto" placeholder="Busca aqui..." />
-          <h3><Link href="./login"><IoPersonCircle />Login</Link><p></p>
+          <h3><Link href="../../login"><IoPersonCircle />Login</Link><p></p>
           <Link href="./regis"><IoPersonCircle />Registrer</Link></h3>
         </nav></header>
       <main><aside>
@@ -21,12 +21,12 @@ export default function Home() {
             Categoría
           </Dropdown.Toggle>
           <Dropdown.Menu id="dropdown-menu">
-            <Dropdown.Item>
+            <Dropdown.Item href="../categoria/ordenadores">
               <button >
                 Ordenadores
               </button>
             </Dropdown.Item>
-            <Dropdown.Item>
+            <Dropdown.Item href="../categoria/moviles">
               <button >
                 Moviles
               </button>

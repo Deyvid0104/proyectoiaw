@@ -10,14 +10,12 @@ export default function Home() {
   return (
     <div className="global">
       <header>
-        <nav>
+        <div className="head">
           <a href="/" className="inicio"><h1>TechStore</h1></a>
           <input type="text" id="texto" name="texto" placeholder="Busca aqui..." />
           <h3><Link href="./login"><IoPersonCircle />Login</Link><p></p>
           <Link href="./regis"><IoPersonCircle />Registrer</Link></h3>
-        </nav></header>
-      <main><aside>
-        <Dropdown>
+        </div><hr/><nav><Dropdown>
           <Dropdown.Toggle variant="success" id="dropdown-basic">
             Categoría
           </Dropdown.Toggle>
@@ -39,11 +37,31 @@ export default function Home() {
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
-        
-      </aside><section><div className="divC">
+        <Dropdown>
+          <Dropdown.Toggle variant="success" id="dropdown-basic">
+            Nuestro equipo
+          </Dropdown.Toggle>
+          <Dropdown.Menu id="dropdown-menu">
+            <Dropdown.Item href="./about/Fabio">
+              <button >
+                Fabio
+              </button>
+            </Dropdown.Item>
+            <Dropdown.Item href="./about/Deyvid">
+              <button >
+                Deyvid
+              </button>
+            </Dropdown.Item>
+            <Dropdown.Item href="./about/Kevin">
+              <button >
+                Kevin
+              </button>
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown></nav></header>
+      <main><section><div className="divC">
           <Carrusel />
         </div></section></main>
-        <footer><h2 className="link_about"><Link href="./about">Nuestro equipo</Link></h2></footer>
     </div>
   );
 }

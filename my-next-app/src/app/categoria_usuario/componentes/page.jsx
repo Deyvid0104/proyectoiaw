@@ -10,10 +10,21 @@ export default function Home() {
     <div className="global">
       <header>
         <nav>
-        <a href="/" className="inicio"><h1>TechStore</h1></a>
+        <a href="../cesta/usuario" className="inicio"><h1>TechStore</h1></a>
           <input type="text" id="texto" name="texto" placeholder="Busca aqui..." />
-          <h3><Link href="../../login"><IoPersonCircle />Login</Link><p></p>
-          <Link href="./regis"><IoPersonCircle />Registrer</Link></h3>
+          <h3><Link href="/"><IoPersonCircle />Cerrar sesión</Link></h3>
+          <h3><Dropdown>
+          <Dropdown.Toggle variant="success" id="cesta-basic">
+            <h4>Mi cesta</h4>
+          </Dropdown.Toggle>
+          <Dropdown.Menu id="cesta-menu">
+            <Dropdown.Item >
+              <button >
+                Productos
+              </button>
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown></h3>
         </nav></header>
       <main><aside>
         <Dropdown>
@@ -21,17 +32,17 @@ export default function Home() {
             Categoría
           </Dropdown.Toggle>
           <Dropdown.Menu id="dropdown-menu">
-            <Dropdown.Item href="../categoria/ordenadores">
+            <Dropdown.Item href="../categoria_usuario/ordenadores">
               <button >
                 Ordenadores
               </button>
             </Dropdown.Item>
-            <Dropdown.Item>
+            <Dropdown.Item href="../categoria_usuario/moviles">
               <button >
                 Moviles
               </button>
             </Dropdown.Item>
-            <Dropdown.Item href="../categoria/componentes">
+            <Dropdown.Item>
               <button >
                 Componentes
               </button>
