@@ -1,16 +1,23 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Headers, Req , UseGuards } from '@nestjs/common';
 import { ProductoService } from './productos.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
+import { Request } from 'express';
+import { JwtAuthGuard } from 'src/modulos/auth/guard/jwt-auth.guard';
+import { RolesGuard } from 'src/modulos/auth/guard/roles.guard';
+/*import { RolesGuard } from 'src/modulos/auth/guard/roles.guard';*/
 
 @Controller('productos') // Define el prefijo de la ruta para este controlador
 export class ProductoController {
   constructor(private readonly productoService: ProductoService) {} // Inyecta el servicio ProductoService
 
-  @Post() // Define la ruta para la creación de un producto (POST /productos)
-  create(@Body() createProductoDto: CreateProductoDto, @Headers('user-role') userRole: string) { // Obtiene los datos del cuerpo de la solicitud y el rol del usuario del encabezado
-    return this.productoService.create(createProductoDto, userRole); // Llama al método create del servicio
-  }
+  @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+    create(@Body() createProductoDto: CreateProductoDto, @Req() req: Request) {
+    const userRole = (req as any).user.rol; // Accede al rol correctamente
+   return this.productoService.create(createProductoDto, userRole);
+  } 
+
 
   @Get() // Define la ruta para obtener todos los productos (GET /productos)
   findAll() {

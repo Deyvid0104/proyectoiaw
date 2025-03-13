@@ -12,8 +12,9 @@ import { PassportModule } from '@nestjs/passport';
     UsuarioModule,
     PassportModule,
     JwtModule.register({
+      global: true,
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '7d' },
     }),
   ],
   controllers: [AuthController],
