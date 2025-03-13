@@ -1,12 +1,14 @@
-'use client'
-import Link from "next/link";
+'use client'; // Esto convierte el componente en un cliente
+import { useEffect, useState } from "react";
+import { FaEuroSign } from "react-icons/fa";
 import { IoPersonCircle } from "react-icons/io5";
 import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Carrusel from "./carrusel/page";
-import { useEffect, useState } from "react";
+import Link from "next/link";
 import "./globals.css";
 
+// Función para obtener productos
 async function getProductos() {
   try {
     const res = await fetch("http://143.47.56.237:3000/productos");
@@ -20,6 +22,7 @@ async function getProductos() {
   }
 }
 
+// Navbar
 const Navbar = () => (
   <header>
     <div className="head">
@@ -57,17 +60,32 @@ const Navbar = () => (
   </header>
 );
 
-const Producto = ({ producto }) => (
+const Producto = ({ producto, onVerDetalle }) => (
   <div className="div_producto">
     <img className="producto-imagen" src={producto?.imagen || "/file.svg"} alt={producto?.nombre || "Imagen del producto"} />
     <h2 className="producto-nombre">{producto?.nombre}</h2>
     <p className="producto-descripcion">{producto?.descripcion}</p>
-    <p className="producto-precio">{producto?.precio}</p>
+    <p className="producto-precio">{producto?.precio} <FaEuroSign /></p>
+    <button onClick={() => onVerDetalle(producto)}>Ver detalles</button>
+  </div>
+);
+
+const ProductoDetalle = ({ producto, onCerrarDetalle }) => (
+  <div className="producto-detalles">
+    <h2>Detalles del producto</h2>
+    <img className="img_detalle" src={producto?.imagen || "/file.svg"} alt={producto?.nombre || "Imagen del producto"} />
+    <div className="producto-info">
+      <h1>{producto?.nombre}</h1>
+      <p>{producto?.descripcion}</p>
+      <p className="producto-precio">Precio: {producto?.precio} <FaEuroSign /></p>
+    </div>
+    <button className="cerrar-btn" onClick={onCerrarDetalle}>Cerrar detalle</button>
   </div>
 );
 
 export default function Home() {
   const [productos, setProductos] = useState(null);
+  const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -78,19 +96,36 @@ export default function Home() {
     fetchProductos();
   }, []); 
 
+  const handleVerDetalle = (producto) => {
+    setProductoSeleccionado(producto);
+  };
+
+  const handleCerrarDetalle = () => {
+    setProductoSeleccionado(null);
+  };
+
   return (
     <div className="global">
       <Navbar />
       <main>
+        {productoSeleccionado && (
+          <section>
+            <ProductoDetalle producto={productoSeleccionado} onCerrarDetalle={handleCerrarDetalle} />
+          </section>
+        )}
+
         <section>
           <div className="divC">
             <Carrusel />
           </div>
-          <div>
+
+          <div className="products-container">
             {productos ? (
-              <Producto producto={productos} />
+              productos.map((producto) => (
+                <Producto key={producto.id_producto} producto={producto} onVerDetalle={handleVerDetalle} />
+              ))
             ) : (
-              <p>Cargando productos...</p> 
+              <p>Cargando productos...</p>
             )}
           </div>
         </section>

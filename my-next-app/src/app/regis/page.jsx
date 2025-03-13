@@ -43,7 +43,7 @@ export default function Page() {
     setLoading(true); // Activar el estado de carga
 
     try {
-      // Realiza la solicitud POST para enviar los datos al backend
+     
       const response = await fetch('http://143.47.56.237:3000/usuarios/registro', {
         method: 'POST',
         headers: {

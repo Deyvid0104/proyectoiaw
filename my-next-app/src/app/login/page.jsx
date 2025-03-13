@@ -23,13 +23,16 @@ export default function Page() {
 
     const data = await response.json();
     
-    // Si el mensaje de la respuesta es 'Login exitoso', redirigimos al usuario
+    // Si el mensaje de la respuesta es 'Login exitoso'
     if (data.message === 'Login exitoso') {
       // Aquí puedes almacenar un token JWT en el localStorage si lo necesitas
-      localStorage.setItem('user', JSON.stringify(data.user)); // Esto es opcional dependiendo de tu aplicación
+      localStorage.setItem('user', JSON.stringify(data.user));
 
-      // Redirigir a la página de inicio
-      window.location.href = '/'; // Cambia la ruta según corresponda
+      if (data.user.role === 'admin') {
+        window.location.href = '../cesta/admin'; // Redirigir a la página de admin
+      } else if (data.user.role === 'usuario') {
+        window.location.href = '../cesta/usuario'; // Redirigir a la página de usuario
+      }
     } else {
       setErrorMessage(data.message); // Mostrar el mensaje de error si el login falla
     }
@@ -59,6 +62,7 @@ export default function Page() {
           {errorMessage && <p className="error">{errorMessage}</p>}
           <p></p>
           <button className='but_login' onClick={handleLogin}>Login</button>
+          <a href='/'><button className='but_volver' >Volver</button></a>
         </Card>
       </div>
     </div>
