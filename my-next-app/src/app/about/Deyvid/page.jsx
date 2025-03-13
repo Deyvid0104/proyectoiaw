@@ -7,14 +7,17 @@ export default function page() {
   return (
     <div className='body_about'>
       <div>
-        <h1 className='top_autor'>Creadores de la página web</h1>
         <div className='about'>
-          <Card><h1 className='autor'>Fabio</h1><hr /><h4>Nombre completo: Fabio Fábrega da Silva</h4>
-            <h3>Edad: 19 años</h3></Card>
-          <Card><h1 className='autor'>Deyvid</h1><hr /><h3>dfsefsdfsedfsefsedfsefds</h3></Card>
-          <Card><h1 className='autor'>Kevin</h1><hr /><h3>dfsefsdfsedfsefsedfsefds</h3></Card>
+          <Card>
+            <a href='https://github.com/Deyvid0104'>
+            <img src='https://img.freepik.com/vector-gratis/ilustracion-joven-sonriente_1308-174401.jpg?t=st=1741782081~exp=1741785681~hmac=7591debe9d5d605658464d83de2a0506543d06e298c5cf6baf82097159fc1c8f&w=740' className='img_autor'/></a>
+            <hr className='hr_autor'/><h2 className='autor'>Deyvid </h2>
+            <hr className='hr_autor'/>
+            <h3>Edad: </h3><hr className='hr_autor'/>
+            <h2 className='bot_autor'><Link href="/">Inicio</Link></h2>
+          </Card>
         </div>
-        <h2 className='bot_autor'><Link href="/">Volver</Link></h2>
-      </div></div>
+      </div>
+    </div>
   )
 }

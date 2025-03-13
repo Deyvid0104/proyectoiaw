@@ -4,13 +4,14 @@ import "../../globals.css";
 import { IoPersonCircle } from "react-icons/io5";
 import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Carrusel from "../../carrusel/page";
 
 export default function Home() {
   return (
     <div className="global">
       <header>
-        <nav>
-        <a href="../cesta/admin" className="inicio"><h1>TechStore</h1></a>
+        <div className="head">
+          <a href="../../cesta/admin" className="inicio"><h1>TechStore</h1></a>
           <input type="text" id="texto" name="texto" placeholder="Busca aqui..." />
           <h3><Link href="/"><IoPersonCircle />Cerrar sesión</Link></h3>
           <h3><Dropdown>
@@ -19,15 +20,11 @@ export default function Home() {
           </Dropdown.Toggle>
           <Dropdown.Menu id="cesta-menu">
             <Dropdown.Item>
-              <button >
-                porductos
-              </button>
+              
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown></h3>
-        </nav></header>
-      <main><aside>
-        <Dropdown>
+        </div><hr/><nav><Dropdown>
           <Dropdown.Toggle variant="success" id="dropdown-basic">
             Categoría
           </Dropdown.Toggle>
@@ -37,7 +34,7 @@ export default function Home() {
                 Ordenadores
               </button>
             </Dropdown.Item>
-            <Dropdown.Item>
+            <Dropdown.Item >
               <button >
                 Moviles
               </button>
@@ -49,10 +46,9 @@ export default function Home() {
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
-        
-      </aside><section><div className="divC">
+        </nav></header>
+      <main><section><div className="divC">
         </div></section></main>
-        <footer><h2 className="link_about"><Link href="../../about">Nuestro equipo</Link></h2></footer>
     </div>
   );
 }

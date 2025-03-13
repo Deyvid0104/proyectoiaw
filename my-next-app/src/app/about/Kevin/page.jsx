@@ -7,14 +7,17 @@ export default function page() {
   return (
     <div className='body_about'>
       <div>
-        <h1 className='top_autor'>Creadores de la página web</h1>
         <div className='about'>
-          <Card><h1 className='autor'>Fabio</h1><hr /><h4>Nombre completo: Fabio Fábrega da Silva</h4>
-            <h3>Edad: 19 años</h3></Card>
-          <Card><h1 className='autor'>Deyvid</h1><hr /><h3>dfsefsdfsedfsefsedfsefds</h3></Card>
-          <Card><h1 className='autor'>Kevin</h1><hr /><h3>dfsefsdfsedfsefsedfsefds</h3></Card>
+          <Card>
+            <a href='https://github.com/migatomax123'>
+            <img src='https://img.freepik.com/vector-gratis/joven-camisa-negra_1308-173618.jpg?t=st=1741782088~exp=1741785688~hmac=1e11867ae2019c474c3237c5f50707fa06a11bae517d6b4f13cdb08f6a8341a7&w=740' className='img_autor'/></a>
+            <hr className='hr_autor'/><h2 className='autor'>Kevin</h2>
+            <hr className='hr_autor'/>
+            <h3>Edad: 19 años</h3><hr className='hr_autor'/>
+            <h2 className='bot_autor'><Link href="/">Inicio</Link></h2>
+          </Card>
         </div>
-        <h2 className='bot_autor'><Link href="/">Volver</Link></h2>
-      </div></div>
+      </div>
+    </div>
   )
 }

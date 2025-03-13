@@ -42,4 +42,16 @@ input {
     border-radius: 5px;
     cursor: pointer;
     width: 100%;
+    margin-bottom: 10px;
+}
+
+.but_volver {
+    background-color: #1b18d4;
+    color: white;
+    font-size: 18px;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
 }
