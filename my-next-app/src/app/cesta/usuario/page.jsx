@@ -49,10 +49,10 @@ const Navbar = ({ carrito, eliminarDeCarrito }) => (
         <Dropdown.Menu id="carrito-menu">
           {carrito.length > 0 ? (
             carrito.map((producto) => (
-              <Dropdown.Item key={producto.id}>
+              <Dropdown.Item key={producto.id_producto}>
                 {producto.nombre} - {producto.precio} 
                 <span> x {producto.cantidad}</span>
-                <button onClick={() => eliminarDeCarrito(producto.id_producto)} style={{ width: "80px", marginLeft: "10px", backgroundColor: "#e74c3c", color: "white", border: "none", padding: "5px 10px", borderRadius: "5px" }}>Eliminar</button>
+                <button onClick={() => eliminarDeCarrito(producto.id)} style={{ width: "80px", marginLeft: "10px", backgroundColor: "#e74c3c", color: "white", border: "none", padding: "5px 10px", borderRadius: "5px" }}>Eliminar</button>
               </Dropdown.Item>
             ))
           ) : (
@@ -136,15 +136,15 @@ export default function Home() {
     fetchProductos();
   }, []);
 
-  const añadirACarrito = (producto, cantidad) => {
-    setCarrito([...carrito, { ...producto, cantidad }]);
+  const añadirACarrito = (producto) => {
+    setCarrito([...carrito, { ...producto,}]);
 
-    fetch('http://143.47.56.237:3000/carritos', {
+    fetch(`http://143.47.56.237:3000/carritos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id_producto: producto.id_producto, cantidad }),
+      body: JSON.stringify({ id_producto: producto.id_producto}),
     }).catch((error) => console.error('Error al añadir al carrito', error));
   };
 

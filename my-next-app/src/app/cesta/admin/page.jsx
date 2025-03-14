@@ -208,9 +208,8 @@ export default function Home() {
       const productosData = await getProductos();
       setProductos(productosData);
     };
-
     fetchProductos();
-  }, []);
+  }, [productos]);
 
 
   const modificarProducto = async (productoModificado) => {
@@ -223,28 +222,45 @@ export default function Home() {
     return productoModificado;
   };
 
-  const agregarNuevoProducto = async () => {
-    const producto = { ...nuevoProducto };
-    const nuevoProductoAgregado = await agregarProducto(producto);
-    if (nuevoProductoAgregado) {
-      setProductos([...productos, nuevoProductoAgregado]);
-      setMostrarFormulario(false);
-      setNuevoProducto({
-        nombre: '',
-        descripcion: '',
-        precio: '',
-        stock: '',
-        imagen: null,
-        marca: '',
-        modelo: ''
-      });
+  const validarFormulario = () => {
+    if (!nuevoProducto.nombre || !nuevoProducto.descripcion || !nuevoProducto.precio) {
+      alert("Por favor, completa todos los campos requeridos.");
+      return false;
     }
+    return true;
   };
   
-  async function deleteproducto(id_producto) { 
-    const token = localStorage.getItem("token")
-    if (!token) throw new Error("No token found")
+  const agregarNuevoProducto = async () => {
+    if (!validarFormulario()) return;
+  };
+  
+  async function deleteproducto(id_producto) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
     }
+  
+    try {
+      const res = await fetch(`http://143.47.56.237:3000/productos/${id_producto}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+  
+      if (!res.ok) {
+        const errorData = await res.json();  // Obtener la respuesta del servidor
+        console.error("Error al eliminar el producto:", errorData);  // Mostrar detalles del error
+        throw new Error("Error al eliminar el producto");
+      }
+  
+      return await res.json();  // Retornar la respuesta exitosa (producto eliminado)
+    } catch (error) {
+      console.error("Error deleting producto:", error);
+      throw error;
+    }
+  }
+  
   const handleVerDetalle = (producto) => {
     setProductoSeleccionado(producto);
   };
@@ -278,13 +294,16 @@ export default function Home() {
   };
   const handleDeleteproducto = async (id) => {
     try {
-      await deleteproducto(id)
-      const updatedproductos = await getProductos()
-      setLibros(updatedproductos)
+      await deleteproducto(id);
+      // Eliminar el producto de la lista local después de la eliminación exitosa
+      const productosRestantes = productos.filter((producto) => producto.id_producto !== id);
+      setProductos(productosRestantes);  // Actualizar el estado con los productos restantes
     } catch (error) {
-      console.error("Error deleting producto:", error)
+      console.error("Error deleting producto:", error);
+      alert("Hubo un problema al intentar eliminar el producto. Intenta nuevamente.");
     }
-  }
+  };
+  
 
   return (
     <div className="global">

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Card from 'react-bootstrap/Card';
+import '../globals.css'
 
 export default function Login() {
   const [email, setEmail] = useState('');
