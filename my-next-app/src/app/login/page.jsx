@@ -1,75 +1,52 @@
-'use client';
-import React, { useState } from 'react';
-import './estilo.css';
+'use client'
+import { useState } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import Card from 'react-bootstrap/Card';
 
-export default function Page() {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
     try {
-      const response = await fetch('http://143.47.56.237:3000/usuarios', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+      const response = await axios.post('http://143.47.56.237:3000/auth/login', {
+        email,
+        password,
       });
-
-      if (!response.ok) {
-        throw new Error('Error en la solicitud');
+      localStorage.setItem('token', response.data.access_token);
+      const decodedToken = JSON.parse(atob(response.data.access_token.split('.')[1]));
+      
+      if (decodedToken.rol === 'admin') {
+        router.push('../cesta/admin');
+      } else if (decodedToken.rol === 'usuario') {
+        router.push('../cesta/usuario');
       }
-
-      const data = await response.json();
-      if (data.message === 'Login exitoso') {
-        localStorage.setItem('user', JSON.stringify(data.usuarios));
-
-        if (data.usuarios.role === 'admin') {
-          window.location.href = '../cesta/admin';
-        } else if (data.usuarios.role === 'usuario') {
-          window.location.href = '../cesta/usuario';
-        }
-      } else {
-        setErrorMessage(data.message);
-      }
-    } catch (error) {
-      console.error('Error al realizar el login:', error);
-      setErrorMessage('Hubo un error al intentar iniciar sesión');
+    } catch (err) {
+      setError('Credenciales inválidas');
     }
   };
 
   return (
     <div className='body_login'>
       <div className='login'>
-        <Card>
-          <h1 className='h1_login'>Iniciar Sesión</h1>
-          <input
-            type="email" 
-            id="texto"
-            name="texto"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            id="texto"
-            name="texto"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {errorMessage && <p className="error">{errorMessage}</p>}
-          <p></p>
-          <button className='but_login' onClick={handleLogin}>Login</button>
-          <a href='/'><button className='but_volver'>Volver</button></a>
-        </Card>
-      </div>
+        <Card><h1 className='h1_login'>Iniciar sessión</h1>
+      <form onSubmit={handleLogin}>
+        <div>
+          <input type="email" value={email} placeholder="Email" onChange={(e) => setEmail(e.target.value)} required />
+        </div>
+        <div>
+          <input type="password" value={password} placeholder="Contraseña" onChange={(e) => setPassword(e.target.value)} required />
+        </div>
+        <button className='but_login' type="submit">Login</button>
+        
+      </form>
+      
+      <a href='/'><button className='but_volver'>Volver</button></a>
+      {error && <p>{error}</p>}</Card></div>
     </div>
   );
 }
