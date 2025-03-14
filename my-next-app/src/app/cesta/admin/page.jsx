@@ -1,11 +1,14 @@
-'use client';
+'use client'; // Esto convierte el componente en un cliente
 import { useEffect, useState } from "react";
 import { FaEuroSign } from "react-icons/fa";
 import { IoPersonCircle } from "react-icons/io5";
+import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Link from "next/link";
 import "../../globals.css";
+import axios from 'axios';
 
+// Función para obtener productos
 async function getProductos() {
   try {
     const res = await fetch("http://143.47.56.237:3000/productos");
@@ -19,48 +22,54 @@ async function getProductos() {
   }
 }
 
-async function modificarProductoAPI(producto) {
+// Función para crear un producto
+async function createProducto(productoData, token) {
   try {
-    const res = await fetch(`http://143.47.56.237:3000/productos/${producto.id}`, {
-      method: "PUT",
+    const res = await axios.post("http://143.47.56.237:3000/productos", productoData, {
       headers: {
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(producto),
     });
-    if (!res.ok) {
-      throw new Error("Error al modificar el producto");
-    }
-    return await res.json();
+    return res.data;
   } catch (error) {
-    console.error("Error al modificar el producto:", error);
-    return null;
+    console.error("Error al crear producto:", error);
+    throw error;
   }
 }
 
-async function agregarProducto(producto) {
+// Función para eliminar un producto
+async function deleteProducto(id, token) {
   try {
-    const res = await fetch("http://143.47.56.237:3000/productos", {
-      method: "POST",
+    await axios.delete(`http://143.47.56.237:3000/productos/${id}`, {
       headers: {
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(producto),
     });
-    if (!res.ok) {
-      throw new Error("Error al añadir el producto");
-    }
-    return await res.json();
   } catch (error) {
-    console.error("Error al añadir el producto:", error);
-    return null;
+    console.error("Error al eliminar producto:", error);
+    throw error;
+  }
+}
+
+// Función para actualizar un producto
+async function updateProducto(id, productoData, token) {
+  try {
+    const res = await axios.put(`http://143.47.56.237:3000/productos/${id}`, productoData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error al actualizar producto:", error);
+    throw error;
   }
 }
 
 const Navbar = () => (
   <header>
     <div className="head">
-      <Link href="" className="inicio"><h1>TechStore</h1></Link>
+      <Link href="/" className="inicio"><h1>TechStore</h1></Link>
       <input type="text" id="texto" name="texto" placeholder="Busca aquí..." aria-label="Buscar productos" />
       <h3><Link href="/"><IoPersonCircle />Cerrar sesión</Link></h3>
     </div>
@@ -68,341 +77,250 @@ const Navbar = () => (
   </header>
 );
 
-const Producto = ({ producto, onVerDetalle, onEliminarProducto }) => (
-  <div className="div_producto" key={producto.id}>
-    <img className="producto-imagen" src={producto?.imagen} alt={producto?.nombre || "Imagen del producto"} />
+const Producto = ({ producto, onEliminar, onEditar }) => (
+  <div className="div_producto">
+    <img className="producto-imagen" src={producto?.imagen || "/file.svg"} alt={producto?.nombre || "Imagen del producto"} />
     <h2 className="producto-nombre">{producto?.nombre}</h2>
     <p className="producto-descripcion">{producto?.descripcion}</p>
     <p className="producto-precio">{producto?.precio} <FaEuroSign /></p>
-    <button className="mod_but" onClick={() => onVerDetalle(producto)}>Modificar</button>
-    <button onClick={() => onEliminarProducto(producto.id_producto)} className="cerrar-btn">
-      Eliminar
-    </button>
+    <button className="btn-editar" onClick={() => onEditar(producto)}>Editar Producto</button>
+    <button className="btn-eliminar" onClick={() => onEliminar(producto.id_producto)}>Eliminar</button>
   </div>
 );
 
+const AñadirProductoForm = ({ onProductoCreado, onCerrarFormulario }) => {
+  const [nombre, setNombre] = useState('');
+  const [precio, setPrecio] = useState('');
+  const [idCategoria, setIdCategoria] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [imagen, setImagen] = useState('');
+  const [marca, setMarca] = useState(''); // Nuevo campo Marca
+  const [modelo, setModelo] = useState(''); // Nuevo campo Modelo
+  const [error, setError] = useState(null);
 
-const ProductoDetalle = ({ producto, onCerrarDetalle, onModificarProducto }) => {
-  const [nombre, setNombre] = useState(producto.nombre);
-  const [descripcion, setDescripcion] = useState(producto.descripcion);
-  const [precio, setPrecio] = useState(producto.precio);
-  const [stock, setStock] = useState(producto.stock);
-  const [imagen, setImagen] = useState(null); 
-  const [marca, setMarca] = useState(producto.marca || ""); 
-  const [modelo, setModelo] = useState(producto.modelo || "");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const handleNombreChange = (event) => setNombre(event.target.value);
-  const handleDescripcionChange = (event) => setDescripcion(event.target.value);
-  const handlePrecioChange = (event) => setPrecio(event.target.value);
-  const handleStockChange = (event) => setStock(event.target.value);
-  const handleMarcaChange = (event) => setMarca(event.target.value);
-  const handleModeloChange = (event) => setModelo(event.target.value);
-
-  const handleImagenChange = (event) => {
-    const archivo = event.target.files[0];
-    if (archivo) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagen(reader.result);
-      };
-      reader.readAsDataURL(archivo);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('No se encontró el token de autenticación');
+      return;
     }
-  };
 
-  const handleModificarProducto = async () => {
-    const productoModificado = { ...producto, nombre, descripcion, precio, stock, imagen, marca, modelo };
-    const productoActualizado = await onModificarProducto(productoModificado);
-
-    if (productoActualizado) {
-      onCerrarDetalle();
+    const productoData = { nombre, precio, id_categoria: idCategoria, descripcion, imagen, marca, modelo }; // Incluimos los nuevos campos
+    try {
+      const producto = await createProducto(productoData, token);
+      onProductoCreado(producto);
+      setError(null);
+      onCerrarFormulario();
+    } catch (error) {
+      setError('Error al crear producto');
     }
   };
 
   return (
-    <div className="producto-detalles">
-      <h2>Detalles del producto</h2>
-      <img className="img_detalle" src={imagen || producto?.imagen || "/file.svg"} alt={producto?.nombre || "Imagen del producto"} />
-      <div className="producto-info">
-        <h1>{producto?.nombre}</h1>
-        <div className="producto_mod">
-          <div>
-            <label>Nombre del producto:</label>
-            <input
-              type="text"
-              value={nombre}
-              onChange={handleNombreChange}
-            />
-          </div>
-          <div>
-            <label>Descripción:</label>
-            <textarea
-              value={descripcion}
-              onChange={handleDescripcionChange}
-            />
-          </div>
-          <div>
-            <label>Precio:</label>
-            <input
-              type="number"
-              value={precio}
-              onChange={handlePrecioChange}
-            />
-          </div>
-          <div>
-            <label>Stock:</label>
-            <input
-              type="number"
-              value={stock}
-              onChange={handleStockChange}
-            />
-          </div>
-          <div>
-            <label>Marca:</label>
-            <input
-              type="text"
-              value={marca}
-              onChange={handleMarcaChange}
-            />
-          </div>
-          <div>
-            <label>Modelo:</label>
-            <input
-              type="text"
-              value={modelo}
-              onChange={handleModeloChange}
-            />
-          </div>
-          <div>
-            <label>Imagen del producto:</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImagenChange}
-            />
-            {imagen && <img src={imagen} alt="Previsualización de la imagen" style={{ marginTop: '10px', width: '100px' }} />}
-          </div>
-        </div>
-        <button onClick={handleModificarProducto}>Guardar cambios</button>
+    <form onSubmit={handleSubmit}>
+      <h2>Añadir Producto</h2>
+      <div>
+        <label>Nombre:</label>
+        <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
       </div>
-      <button className="cerrar-btn" onClick={onCerrarDetalle}>Cancelar</button>
-    </div>
+      <div>
+        <label>Precio:</label>
+        <input type="number" value={precio} onChange={(e) => setPrecio(e.target.value)} required />
+      </div>
+      <div>
+        <label>ID Categoría:</label>
+        <input type="text" value={idCategoria} onChange={(e) => setIdCategoria(e.target.value)} required />
+      </div>
+      <div>
+        <label>Descripción:</label>
+        <textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
+      </div>
+      <div>
+        <label>Imagen URL:</label>
+        <input type="text" value={imagen} onChange={(e) => setImagen(e.target.value)} />
+      </div>
+      <div>
+        <label>Marca:</label>
+        <input type="text" value={marca} onChange={(e) => setMarca(e.target.value)} required />
+      </div>
+      <div>
+        <label>Modelo:</label>
+        <input type="text" value={modelo} onChange={(e) => setModelo(e.target.value)} required />
+      </div>
+
+      <button className="btn-crear" type="submit">Crear Producto</button>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+    </form>
+  );
+};
+
+const EditarProductoForm = ({ producto, onProductoEditado, onCerrarFormulario }) => {
+  const [nombre, setNombre] = useState(producto?.nombre || '');
+  const [precio, setPrecio] = useState(producto?.precio || '');
+  const [idCategoria, setIdCategoria] = useState(producto?.id_categoria || '');
+  const [descripcion, setDescripcion] = useState(producto?.descripcion || '');
+  const [imagen, setImagen] = useState(producto?.imagen || '');
+  const [marca, setMarca] = useState(producto?.marca || '');
+  const [modelo, setModelo] = useState(producto?.modelo || '');
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('No se encontró el token de autenticación');
+      return;
+    }
+
+    const productoData = { nombre, precio, id_categoria: idCategoria, descripcion, imagen, marca, modelo }; // Incluimos los nuevos campos
+    try {
+      const productoEditado = await updateProducto(producto.id_producto, productoData, token);
+      onProductoEditado(productoEditado);
+      setError(null);
+      onCerrarFormulario();
+    } catch (error) {
+      setError('Error al actualizar producto');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Editar Producto</h2>
+      <div>
+        <label>Nombre:</label>
+        <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+      </div>
+      <div>
+        <label>Precio:</label>
+        <input type="number" value={precio} onChange={(e) => setPrecio(e.target.value)} required />
+      </div>
+      <div>
+        <label>ID Categoría:</label>
+        <input type="text" value={idCategoria} onChange={(e) => setIdCategoria(e.target.value)} required />
+      </div>
+      <div>
+        <label>Descripción:</label>
+        <textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
+      </div>
+      <div>
+        <label>Imagen URL:</label>
+        <input type="text" value={imagen} onChange={(e) => setImagen(e.target.value)} />
+      </div>
+      <div>
+        <label>Marca:</label>
+        <input type="text" value={marca} onChange={(e) => setMarca(e.target.value)} required />
+      </div>
+      <div>
+        <label>Modelo:</label>
+        <input type="text" value={modelo} onChange={(e) => setModelo(e.target.value)} required />
+      </div>
+      <div className="form-buttons">
+        <button className="btn-crear" type="submit">Guardar Cambios</button>
+        <button className="btn-cancelar" type="button" onClick={onCerrarFormulario}>Cancelar</button>
+      </div>
+
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+    </form>
   );
 };
 
 export default function Home() {
   const [productos, setProductos] = useState(null);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [nuevoProducto, setNuevoProducto] = useState({
-    nombre: '',
-    descripcion: '',
-    precio: '',
-    stock: '',
-    imagen: null,
-    marca: '',
-    modelo: ''
-  });
+  const [mostrarFormularioAñadir, setMostrarFormularioAñadir] = useState(false); // Estado para mostrar el formulario de añadir
+  const [mostrarFormularioEditar, setMostrarFormularioEditar] = useState(false); // Estado para mostrar el formulario de editar
 
   useEffect(() => {
     const fetchProductos = async () => {
       const productosData = await getProductos();
       setProductos(productosData);
     };
+
     fetchProductos();
-  }, [productos]);
+  }, []);
 
-
-  const modificarProducto = async (productoModificado) => {
-    const productoActualizado = await modificarProductoAPI(productoModificado);
-    if (productoActualizado) {
-      setProductos(productos.map((producto) =>
-        producto.id_producto === productoModificado.id_producto ? productoModificado : producto
-      ));
-    }
-    return productoModificado;
+  const handleEditarProducto = (producto) => {
+    setProductoSeleccionado(producto);  // Establece el producto a editar
+    setMostrarFormularioEditar(true); // Muestra el formulario de edición
   };
 
-  const validarFormulario = () => {
-    if (!nuevoProducto.nombre || !nuevoProducto.descripcion || !nuevoProducto.precio) {
-      alert("Por favor, completa todos los campos requeridos.");
-      return false;
-    }
-    return true;
+  const handleCerrarFormularioAñadir = () => {
+    setMostrarFormularioAñadir(false); // Cerrar el formulario de añadir
   };
-  
-  const agregarNuevoProducto = async () => {
-    if (!validarFormulario()) return;
+
+  const handleCerrarFormularioEditar = () => {
+    setMostrarFormularioEditar(false); // Cerrar el formulario de editar
+    setProductoSeleccionado(null); // Limpiar producto seleccionado
   };
-  
-  async function deleteproducto(id_producto) {
-    const token = localStorage.getItem("token");
+
+  const handleEliminar = async (id) => {
+    const token = localStorage.getItem('token');
     if (!token) {
-      throw new Error("No token found");
+      alert('No estás autenticado');
+      return;
     }
-  
+
     try {
-      const res = await fetch(`http://143.47.56.237:3000/productos/${id_producto}`, {
-        method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
-  
-      if (!res.ok) {
-        const errorData = await res.json();  // Obtener la respuesta del servidor
-        console.error("Error al eliminar el producto:", errorData);  // Mostrar detalles del error
-        throw new Error("Error al eliminar el producto");
-      }
-  
-      return await res.json();  // Retornar la respuesta exitosa (producto eliminado)
+      await deleteProducto(id, token);
+      setProductos(productos.filter((producto) => producto.id_producto !== id));
     } catch (error) {
-      console.error("Error deleting producto:", error);
-      throw error;
-    }
-  }
-  
-  const handleVerDetalle = (producto) => {
-    setProductoSeleccionado(producto);
-  };
-
-  const handleCerrarDetalle = () => {
-    setProductoSeleccionado(null);
-  };
-
-  const handleMostrarFormulario = () => {
-    setMostrarFormulario(true);
-  };
-
-  const handleCancelarFormulario = () => {
-    setMostrarFormulario(false);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNuevoProducto({ ...nuevoProducto, [name]: value });
-  };
-
-  const handleImagenChange = (e) => {
-    const archivo = e.target.files[0];
-    if (archivo) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNuevoProducto({ ...nuevoProducto, imagen: reader.result });
-      };
-      reader.readAsDataURL(archivo); 
+      alert('Error al eliminar el producto');
     }
   };
-  const handleDeleteproducto = async (id) => {
-    try {
-      await deleteproducto(id);
-      // Eliminar el producto de la lista local después de la eliminación exitosa
-      const productosRestantes = productos.filter((producto) => producto.id_producto !== id);
-      setProductos(productosRestantes);  // Actualizar el estado con los productos restantes
-    } catch (error) {
-      console.error("Error deleting producto:", error);
-      alert("Hubo un problema al intentar eliminar el producto. Intenta nuevamente.");
-    }
+
+  const handleProductoCreado = (producto) => {
+    setProductos([producto, ...productos]);
+    setMostrarFormularioAñadir(false); // Ocultar formulario después de la creación
   };
-  
+
+  const handleProductoEditado = (productoEditado) => {
+    setProductos(productos.map((producto) => producto.id_producto === productoEditado.id_producto ? productoEditado : producto));
+    setMostrarFormularioEditar(false); // Ocultar formulario después de la edición
+  };
 
   return (
     <div className="global">
       <Navbar />
       <main>
-        {productoSeleccionado && (
-          <section>
-            <ProductoDetalle
-              producto={productoSeleccionado}
-              onCerrarDetalle={handleCerrarDetalle}
-              onModificarProducto={modificarProducto}
-            />
-          </section>
-        )}
         <section>
-          <div className="divC">        
-            <button onClick={handleMostrarFormulario} className="btn btn-primary">
-              Añadir Producto
+          <div className="divC">
+            <button className="btn-crear" onClick={() => setMostrarFormularioAñadir(!mostrarFormularioAñadir)}>
+              {mostrarFormularioAñadir ? 'Cancelar' : 'Añadir Producto'}
             </button>
-            <div className="producto_create">
-            {mostrarFormulario && (
-              <div className="formulario-producto">
-                <h2>Añadir Producto</h2>
-                <div>
-                  <label>Nombre:</label>
-                  <input
-                    type="text"
-                    name="nombre"
-                    value={nuevoProducto.nombre}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>Descripción:</label>
-                  <textarea
-                    name="descripcion"
-                    value={nuevoProducto.descripcion}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>Precio:</label>
-                  <input type="number"
-                    name="precio"
-                    value={nuevoProducto.precio}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>Stock:</label>
-                  <input
-                    type="number"
-                    name="stock"
-                    value={nuevoProducto.stock}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>Marca:</label>
-                  <input
-                    type="text"
-                    name="marca"
-                    value={nuevoProducto.marca}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>Modelo:</label>
-                  <input
-                    type="text"
-                    name="modelo"
-                    value={nuevoProducto.modelo}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>Imagen del producto:</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImagenChange}
-                  />
-                  {nuevoProducto.imagen && <img src={nuevoProducto.imagen} alt="Previsualización" style={{ marginTop: '10px', width: '100px' }} />}
-                </div>
-                <button onClick={agregarNuevoProducto} className="btn btn-success">
-                  Guardar Producto
-                </button>
-                <button onClick={handleCancelarFormulario} className="btn btn-secondary">
-                  Cancelar
-                </button>
-              </div>
-            )}
-            </div>
+            <section className="producto_mod">
+              {mostrarFormularioAñadir && <AñadirProductoForm onProductoCreado={handleProductoCreado} onCerrarFormulario={handleCerrarFormularioAñadir} />}
+            </section>
           </div>
+
+          <div className="divC">
+            {productoSeleccionado && (
+              <button className="btn-crear" onClick={() => setMostrarFormularioEditar(!mostrarFormularioEditar)}>
+                {mostrarFormularioEditar ? 'Cancelar' : 'Editar Producto'}
+              </button>
+            )}
+            <section className="producto_mod">
+              {mostrarFormularioEditar && (
+                <EditarProductoForm
+                  producto={productoSeleccionado}
+                  onProductoEditado={handleProductoEditado}
+                  onCerrarFormulario={handleCerrarFormularioEditar}
+                />
+              )}
+            </section>
+          </div>
+
           <div className="products-container">
             {productos ? (
               productos.map((producto) => (
-                <Producto key={producto.id_producto} producto={producto} 
-                onVerDetalle={handleVerDetalle} onEliminarProducto={handleDeleteproducto} />
+                <Producto
+                  key={producto.id_producto}
+                  producto={producto}
+                  onEditar={handleEditarProducto} // Llama a editar cuando se hace click en editar
+                  onEliminar={handleEliminar}
+                />
               ))
             ) : (
               <p>Cargando productos...</p>

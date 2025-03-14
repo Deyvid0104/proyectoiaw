@@ -474,3 +474,48 @@ button:hover {
   border-color: #007bff;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
 }
+
+.btn-editar, .btn-eliminar, .btn-crear, .btn-cancelar {
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 5px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn-editar {
+  background-color: #4CAF50; /* Verde */
+  color: white;
+}
+
+.btn-editar:hover {
+  background-color: #45a049;
+}
+
+.btn-eliminar {
+  background-color: #f44336; /* Rojo */
+  color: white;
+}
+
+.btn-eliminar:hover {
+  background-color: #e53935;
+}
+
+.btn-crear {
+  background-color: #008CBA; /* Azul */
+  color: white;
+}
+
+.btn-crear:hover {
+  background-color: #007bb5;
+}
+
+.btn-cancelar {
+  background-color: #f1f1f1; /* Gris claro */
+  color: black;
+}
+
+.btn-cancelar:hover {
+  background-color: #ccc;
+}
