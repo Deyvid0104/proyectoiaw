@@ -29,13 +29,17 @@ export class ProductoController {
     return this.productoService.findOne(+id); // Llama al método findOne del servicio
   }
 
-  @Put(':id') // Define la ruta para actualizar un producto (PUT /productos/:id)
-  update(@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto, @Headers('user-role') userRole: string) { // Obtiene los datos del cuerpo de la solicitud, el ID del producto y el rol del usuario
-    return this.productoService.update(+id, updateProductoDto, userRole); // Llama al método update del servicio
+  @Put(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  update(@Param('id') id: string, @Body() updateProductoDto: UpdateProductoDto, @Req() req: Request) {
+    const userRole = (req as any).user.rol;
+    return this.productoService.update(+id, updateProductoDto, userRole);
   }
 
-  @Delete(':id') // Define la ruta para eliminar un producto (DELETE /productos/:id)
-  remove(@Param('id') id: string, @Headers('user-role') userRole: string) { // Obtiene el ID del producto y el rol del usuario
-    return this.productoService.remove(+id, userRole); // Llama al método remove del servicio
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  remove(@Param('id') id: string, @Req() req: Request) {
+    const userRole = (req as any).user.rol;
+    return this.productoService.remove(+id, userRole);
   }
 }

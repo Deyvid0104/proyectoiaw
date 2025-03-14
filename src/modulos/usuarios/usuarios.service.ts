@@ -27,24 +27,27 @@ export class UsuarioService {
     if (usuarioExistente) {
       throw new BadRequestException('El correo electrónico ya está en uso');
     }
-
+  
     const hashedPassword = await bcrypt.hash(createUsuarioDto.password, 10);
     const usuario = this.usuarioRepository.create({
       ...createUsuarioDto,
       password: hashedPassword,
     });
-
+  
     const usuarioGuardado = await this.usuarioRepository.save(usuario);
-
+  
     // Crear un carrito asociado al usuario
-    await this.carritoService.create({
+    const carrito = await this.carritoService.create({
       id_usuario: usuarioGuardado.id_usuario,
       fecha_creacion: new Date(),
       estado: 'activo',
     });
-
-    return usuarioGuardado;
+  
+    // Asociar el carrito al usuario y guardar nuevamente
+    usuarioGuardado.carrito = carrito;
+    return this.usuarioRepository.save(usuarioGuardado);
   }
+  
 
   async actualizarUsuario(idUsuario: number, updateUsuarioDto: UpdateUsuarioDto): Promise<Usuario> {
     const usuario = await this.findOne(idUsuario);
@@ -73,10 +76,15 @@ export class UsuarioService {
   }
 
   async findOne(idUsuario: number): Promise<Usuario> {
-    const usuario = await this.usuarioRepository.findOneBy({ id_usuario: idUsuario });
+    const usuario = await this.usuarioRepository.findOne({
+      where: { id_usuario: idUsuario },
+      relations: ['carrito','pedidos'], // Cargar la relación con Carrito
+    });
+  
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${idUsuario} no encontrado`);
     }
+  
     return usuario;
   }
 

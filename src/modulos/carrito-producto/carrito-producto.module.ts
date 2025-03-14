@@ -5,9 +5,9 @@ import { CarritoProductoController } from './carrito-producto.controller';
 import { CarritoProductoService } from './carrito-producto.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CarritoProducto])],
+  imports: [TypeOrmModule.forFeature([CarritoProducto])], // Importar la entidad CarritoProducto
   controllers: [CarritoProductoController],
   providers: [CarritoProductoService],
-  exports: [CarritoProductoService],
+  exports: [TypeOrmModule.forFeature([CarritoProducto])], // Exportar el repositorio de CarritoProducto
 })
-export class CarritoProductosModule  {}
+export class CarritoProductoModule {}

@@ -24,7 +24,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     if (user.rol !== 'admin') {
       console.error('Solo los administradores pueden crear productos:', user.rol); // Depuración
-      throw new UnauthorizedException('Solo los administradores pueden crear productos');
+      throw new UnauthorizedException('Solo los administradores pueden realizar esta operación');
     }
 
     return user;

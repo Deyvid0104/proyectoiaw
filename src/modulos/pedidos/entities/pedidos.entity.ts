@@ -8,8 +8,8 @@ export class Pedido {
   @PrimaryGeneratedColumn()
   id_pedido: number;
 
-  @ManyToOne(() => Usuario, (usuario) => usuario.pedidos)
-  @JoinColumn({ name: 'id_usuario' })
+  @ManyToOne(() => Usuario, usuario => usuario.pedidos, { onDelete: 'CASCADE' }) // Relación con usuario
+  @JoinColumn({ name: 'id_usuario' }) // Clave foránea
   usuario: Usuario;
 
   @Column()

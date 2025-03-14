@@ -1,15 +1,19 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, NotFoundException, Req, UseGuards } from '@nestjs/common';
 import { CategoriaService } from './categoria.service';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { RolesGuard } from '../auth/guard/roles.guard';
 
 @Controller('categorias')
 export class CategoriaController {
   constructor(private readonly categoriaService: CategoriaService) {}
 
   @Post()
-  create(@Body() createCategoriaDto: CreateCategoriaDto) {
-    return this.categoriaService.create(createCategoriaDto);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  create(@Body() createCategoriaDto: CreateCategoriaDto, @Req() req: Request) {
+    const userRole = (req as any).user.rol; // Accede al rol correctamente
+    return this.categoriaService.create(createCategoriaDto, userRole);
   }
 
   @Get()
@@ -18,17 +22,25 @@ export class CategoriaController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoriaService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const categoria = await this.categoriaService.findOne(+id);
+    if (!categoria) {
+      throw new NotFoundException(`Categoría con ID ${id} no encontrada`);
+    }
+    return categoria;
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateCategoriaDto: UpdateCategoriaDto) {
-    return this.categoriaService.update(+id, updateCategoriaDto);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  update(@Param('id') id: string, @Body() updateCategoriaDto: UpdateCategoriaDto, @Req() req: Request) {
+    const userRole = (req as any).user.rol; // Accede al rol correctamente
+    return this.categoriaService.update(+id, updateCategoriaDto, userRole);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoriaService.remove(+id);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  remove(@Param('id') id: string, @Req() req: Request) {
+    const userRole = (req as any).user.rol; // Accede al rol correctamente
+    return this.categoriaService.remove(+id, userRole);
   }
 }

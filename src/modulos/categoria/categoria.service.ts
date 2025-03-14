@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Categoria } from './entities/categoria.entity';
@@ -12,7 +12,10 @@ export class CategoriaService {
     private categoriaRepository: Repository<Categoria>,
   ) {}
 
-  async create(createCategoriaDto: CreateCategoriaDto): Promise<Categoria> {
+  async create(createCategoriaDto: CreateCategoriaDto, userRole: string): Promise<Categoria> {
+    if (userRole !== 'admin') {
+      throw new ForbiddenException('No tienes permisos para crear categorías');
+    }
     const categoria = this.categoriaRepository.create(createCategoriaDto);
     return this.categoriaRepository.save(categoria);
   }
@@ -22,20 +25,31 @@ export class CategoriaService {
   }
 
   async findOne(id: number): Promise<Categoria> {
-    const categoria = await this.categoriaRepository.findOneBy({ id_categoria: id });
+    const categoria = await this.categoriaRepository.findOne({
+      where: { id_categoria: id },
+      relations: ['productos'], // Cargar la relación de productos
+    });
+
     if (!categoria) {
       throw new NotFoundException(`Categoría con ID ${id} no encontrada`);
     }
+
     return categoria;
   }
 
-  async update(id: number, updateCategoriaDto: UpdateCategoriaDto): Promise<Categoria> {
+  async update(id: number, updateCategoriaDto: UpdateCategoriaDto, userRole: string): Promise<Categoria> {
+    if (userRole !== 'admin') {
+      throw new ForbiddenException('No tienes permisos para actualizar categorías');
+    }
     const categoria = await this.findOne(id);
     this.categoriaRepository.merge(categoria, updateCategoriaDto);
     return this.categoriaRepository.save(categoria);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: number, userRole: string): Promise<void> {
+    if (userRole !== 'admin') {
+      throw new ForbiddenException('No tienes permisos para eliminar categorías');
+    }
     const categoria = await this.findOne(id);
     await this.categoriaRepository.remove(categoria);
   }

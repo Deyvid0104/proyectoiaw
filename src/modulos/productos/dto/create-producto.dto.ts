@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsDecimal } from 'class-validator';
+import { IsString, IsNumber, IsDecimal,IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateProductoDto {
   @IsString()
@@ -8,6 +8,7 @@ export class CreateProductoDto {
   descripcion: string;
 
   @IsDecimal()
+  @IsNotEmpty()
   precio: number;
 
   @IsNumber()
@@ -17,7 +18,8 @@ export class CreateProductoDto {
   id_categoria: number;
 
   @IsString()
-  imagen: string;
+  @IsOptional()
+  imagen?: string;
 
   @IsString()
   marca: string;

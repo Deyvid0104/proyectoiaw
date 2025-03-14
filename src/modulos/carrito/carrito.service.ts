@@ -2,16 +2,20 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Carrito } from './entities/carrito.entity';
+import { CarritoProducto } from '../carrito-producto/entities/carrito-producto.entity'; // Importar la entidad CarritoProducto
 import { ProductoService } from '../productos/productos.service';
 import { CreateCarritoDto } from './dto/create-carrito.dto';
 import { UpdateCarritoDto } from './dto/update-carrito.dto';
-import { CarritoProducto } from '../carrito-producto/entities/carrito-producto.entity'; // Asegúrate de que la ruta sea correcta
 
 @Injectable()
 export class CarritoService {
   constructor(
     @InjectRepository(Carrito)
     private carritoRepository: Repository<Carrito>,
+
+    @InjectRepository(CarritoProducto) // Inyectar el repositorio de CarritoProducto
+    private carritoProductoRepository: Repository<CarritoProducto>,
+
     private productoService: ProductoService,
   ) {}
 
@@ -24,15 +28,26 @@ export class CarritoService {
     return this.carritoRepository.find();
   }
 
-  async findOne(id: number): Promise<Carrito> {
+  async findOne(id: number): Promise<any> {
     const carrito = await this.carritoRepository.findOne({
       where: { id_carrito: id },
-      relations: ['carritoProductos', 'carritoProductos.producto'],
+      relations: ['carritoProductos', 'carritoProductos.producto'], // Cargar relaciones
     });
+
     if (!carrito) {
       throw new NotFoundException(`Carrito con ID ${id} no encontrado`);
     }
-    return carrito;
+
+    // Calcular el subtotal para cada producto en el carrito
+    const carritoConSubtotal = {
+      ...carrito,
+      carritoProductos: carrito.carritoProductos.map((cp) => ({
+        ...cp,
+        subtotal: cp.producto.precio * cp.cantidad, // Calcular el subtotal
+      })),
+    };
+
+    return carritoConSubtotal;
   }
 
   async update(id: number, updateCarritoDto: UpdateCarritoDto): Promise<Carrito> {
@@ -46,7 +61,23 @@ export class CarritoService {
     await this.carritoRepository.remove(carrito);
   }
 
-  async agregarProducto(idCarrito: number, idProducto: number, cantidad: number): Promise<Carrito> {
+  async agregarProducto(idCarrito: number, idProducto: number, cantidad: number): Promise<{
+    id_carrito: number;
+    fecha_creacion: Date;
+    estado: string;
+    carritoProductos: {
+      id: number;
+      cantidad: number;
+      producto: {
+        id_producto: number;
+        nombre: string;
+        descripcion: string;
+        precio: number;
+        stock: number;
+      };
+      subtotal: number; // Incluir el subtotal
+    }[];
+  }> {
     const carrito = await this.findOne(idCarrito);
     const producto = await this.productoService.findOne(idProducto);
 
@@ -58,19 +89,36 @@ export class CarritoService {
       throw new BadRequestException(`Stock insuficiente para el producto con ID ${idProducto}`);
     }
 
+    // Crear la relación CarritoProducto
     const carritoProducto = new CarritoProducto();
     carritoProducto.carrito = carrito;
     carritoProducto.producto = producto;
     carritoProducto.cantidad = cantidad;
 
-    if (!carrito.carritoProductos) {
-      carrito.carritoProductos = [];
-    }
+    // Guardar la relación CarritoProducto
+    await this.carritoProductoRepository.save(carritoProducto);
 
-    carrito.carritoProductos.push(carritoProducto);
-    await this.carritoRepository.save(carrito);
+    // Obtener el carrito actualizado con los productos
+    const carritoActualizado = await this.findOne(idCarrito);
 
-    return this.findOne(idCarrito);
+    // Formatear la respuesta para incluir el subtotal
+    return {
+      id_carrito: carritoActualizado.id_carrito,
+      fecha_creacion: carritoActualizado.fecha_creacion,
+      estado: carritoActualizado.estado,
+      carritoProductos: carritoActualizado.carritoProductos.map((cp) => ({
+        id: cp.id,
+        cantidad: cp.cantidad,
+        producto: {
+          id_producto: cp.producto.id_producto,
+          nombre: cp.producto.nombre,
+          descripcion: cp.producto.descripcion,
+          precio: cp.producto.precio,
+          stock: cp.producto.stock,
+        },
+        subtotal: cp.producto.precio * cp.cantidad, // Calcular el subtotal
+      })),
+    };
   }
 
   async eliminarProducto(idCarrito: number, idProducto: number): Promise<Carrito> {
@@ -80,29 +128,43 @@ export class CarritoService {
       return carrito;
     }
 
-    carrito.carritoProductos = carrito.carritoProductos.filter(
-      (cp) => cp.producto.id_producto !== idProducto,
+    // Buscar la relación CarritoProducto y eliminarla
+    const carritoProducto = carrito.carritoProductos.find(
+      (cp) => cp.producto.id_producto === idProducto,
     );
-    await this.carritoRepository.save(carrito);
 
-    return this.findOne(idCarrito);
+    if (carritoProducto) {
+      await this.carritoProductoRepository.remove(carritoProducto);
+    }
+
+    return this.findOne(idCarrito); // Retornar el carrito actualizado
   }
 
-  async listarProductos(idCarrito: number): Promise<{ producto: any; cantidad: number; subtotal: number }[]> {
+  async listarProductos(idCarrito: number): Promise<{ producto: any; cantidad: number; precio: number; subtotal: number }[]> {
     const carrito = await this.findOne(idCarrito);
 
     if (!carrito.carritoProductos) {
       return [];
     }
 
-    return Promise.all(
-      carrito.carritoProductos.map(async (cp) => {
-        const producto = await this.productoService.findOne(cp.producto.id_producto);
-        const cantidad = cp.cantidad;
-        const subtotal = producto.precio * cantidad;
-        return { producto, cantidad, subtotal };
-      }),
-    );
+    return carrito.carritoProductos.map((cp) => {
+      const producto = cp.producto; // Obtener el producto directamente desde la relación
+      const cantidad = cp.cantidad;
+      const precio = producto.precio; // Obtener el precio del producto
+      const subtotal = precio * cantidad; // Calcular el subtotal
+
+      return {
+        producto: {
+          id_producto: producto.id_producto,
+          nombre: producto.nombre,
+          descripcion: producto.descripcion,
+          precio: producto.precio, // Incluir el precio en la respuesta
+        },
+        cantidad,
+        precio, // Incluir el precio en la respuesta
+        subtotal, // Incluir el subtotal en la respuesta
+      };
+    });
   }
 
   async actualizarCantidad(idCarrito: number, idProducto: number, cantidad: number): Promise<Carrito> {
@@ -112,14 +174,16 @@ export class CarritoService {
       return carrito;
     }
 
+    // Buscar la relación CarritoProducto y actualizar la cantidad
     const carritoProducto = carrito.carritoProductos.find(
       (cp) => cp.producto.id_producto === idProducto,
     );
+
     if (carritoProducto) {
       carritoProducto.cantidad = cantidad;
-      await this.carritoRepository.save(carrito);
+      await this.carritoProductoRepository.save(carritoProducto); // Guardar los cambios
     }
 
-    return this.findOne(idCarrito);
+    return this.findOne(idCarrito); // Retornar el carrito actualizado
   }
 }
