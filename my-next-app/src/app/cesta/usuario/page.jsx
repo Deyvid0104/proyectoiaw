@@ -21,35 +21,6 @@ async function getProductos() {
   }
 }
 
-async function obtenerCarritoDelBackend() {
-  try {
-    const res = await fetch("http://143.47.56.237:3000/carrito", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return res.json();
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
-}
-
-async function guardarCarritoEnBackend(carrito) {
-  try {
-    const res = await fetch("http://143.47.56.237:3000/carrito", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(carrito),
-    });
-    return await res.json();
-  } catch (error) {
-    console.error(error);
-  }
-}
 
 async function eliminarProductoDeCarritoEnBackend(productoId) {
   try {
@@ -79,9 +50,9 @@ const Navbar = ({ carrito, eliminarDeCarrito }) => (
           {carrito.length > 0 ? (
             carrito.map((producto) => (
               <Dropdown.Item key={producto.id}>
-                {producto.imagen} - {producto.nombre} - {producto.precio} 
+                {producto.nombre} - {producto.precio} 
                 <span> x {producto.cantidad}</span>
-                <button onClick={() => eliminarDeCarrito(producto.id)} style={{ marginLeft: "10px", backgroundColor: "#e74c3c", color: "white", border: "none", padding: "5px 10px", borderRadius: "5px" }}>Eliminar</button>
+                <button onClick={() => eliminarDeCarrito(producto.id_producto)} style={{ width: "80px", marginLeft: "10px", backgroundColor: "#e74c3c", color: "white", border: "none", padding: "5px 10px", borderRadius: "5px" }}>Eliminar</button>
               </Dropdown.Item>
             ))
           ) : (
@@ -124,12 +95,6 @@ const ProductoDetalle = ({ producto, añadirACarrito, onCerrarDetalle }) => {
     setCantidad(nuevaCantidad);
   };
 
-  const handleAñadirACarrito = () => {
-    if (cantidad > 0) {
-      añadirACarrito(producto, cantidad);
-    }
-  };
-
   return (
     <div className="producto-detalles">
       <h2>Detalles del producto</h2>
@@ -148,7 +113,9 @@ const ProductoDetalle = ({ producto, añadirACarrito, onCerrarDetalle }) => {
             onChange={handleCantidadChange} 
             style={{ width: '50px' }}
           />
-          <button onClick={handleAñadirACarrito}>Añadir al carrito</button>
+          <button onClick={() => añadirACarrito(producto, cantidad)}>
+              Agregar al carrito
+            </button>
         </div>
       </div>
       <button className="cerrar-btn" onClick={onCerrarDetalle}>Cerrar detalle</button>
@@ -166,37 +133,19 @@ export default function Home() {
       const productosData = await getProductos();
       setProductos(productosData);
     };
-
-    const fetchCarrito = async () => {
-      const carritoData = await obtenerCarritoDelBackend();
-      setCarrito(carritoData);
-    };
-
     fetchProductos();
-    fetchCarrito();
   }, []);
 
-  const añadirACarrito = async (producto, cantidad) => {
-    const carritoExistente = carrito.find(c => c.id_carrito === producto.id_producto);
-    let nuevoCarrito;
+  const añadirACarrito = (producto, cantidad) => {
+    setCarrito([...carrito, { ...producto, cantidad }]);
 
-    if (carritoExistente) {
-      nuevoCarrito = carrito.map(item => 
-        item.id_carrito === producto.id_producto 
-          ? { ...item, carritoProductos: [...item.carritoProductos, { producto, cantidad }] } 
-          : item
-      );
-    } else {
-      nuevoCarrito = [...carrito, { 
-        id_carrito: producto.id_producto,
-        fecha_creacion: new Date(),
-        estado: "activo",
-        carritoProductos: [{ producto, cantidad }]
-      }];
-    }
-
-    setCarrito(nuevoCarrito);
-    await guardarCarritoEnBackend(nuevoCarrito);
+    fetch('http://143.47.56.237:3000/carritos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id_producto: producto.id_producto, cantidad }),
+    }).catch((error) => console.error('Error al añadir al carrito', error));
   };
 
   const eliminarDeCarrito = async (productoId) => {
