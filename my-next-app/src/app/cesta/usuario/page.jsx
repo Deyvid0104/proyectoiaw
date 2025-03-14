@@ -1,4 +1,4 @@
-'use client'; // Esto convierte el componente en un cliente
+'use client';
 import { useEffect, useState } from "react";
 import { FaEuroSign } from "react-icons/fa";
 import { IoPersonCircle } from "react-icons/io5";
@@ -8,7 +8,6 @@ import Carrusel from "../../carrusel/page";
 import Link from "next/link";
 import "../../globals.css";
 
-// Función para obtener productos
 async function getProductos() {
   try {
     const res = await fetch("http://143.47.56.237:3000/productos");
@@ -22,28 +21,71 @@ async function getProductos() {
   }
 }
 
+async function obtenerCarritoDelBackend() {
+  try {
+    const res = await fetch("http://143.47.56.237:3000/carrito", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return res.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
 
-const Navbar = ({ cesta, eliminarDeCesta }) => (
+async function guardarCarritoEnBackend(carrito) {
+  try {
+    const res = await fetch("http://143.47.56.237:3000/carrito", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(carrito),
+    });
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function eliminarProductoDeCarritoEnBackend(productoId) {
+  try {
+    const res = await fetch(`http://143.47.56.237:3000/carrito/${productoId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+const Navbar = ({ carrito, eliminarDeCarrito }) => (
   <header>
     <div className="head">
       <Link href="" className="inicio"><h1>TechStore</h1></Link>
       <input type="text" id="texto" name="texto" placeholder="Busca aquí..." aria-label="Buscar productos" />
       <h3><Link href="/"><IoPersonCircle />Cerrar sesión</Link></h3>
       <h3><Dropdown>
-        <Dropdown.Toggle variant="success" id="cesta-basic">
-          <h4>Mi cesta ({cesta.length})</h4>
+        <Dropdown.Toggle variant="success" id="carrito-basic">
+          <h4>Mi carrito ({carrito.length})</h4>
         </Dropdown.Toggle>
-        <Dropdown.Menu id="cesta-menu">
-          {cesta.length > 0 ? (
-            cesta.map((producto) => (
-              <Dropdown.Item key={producto.id}> {/* Usamos producto.id como key */}
+        <Dropdown.Menu id="carrito-menu">
+          {carrito.length > 0 ? (
+            carrito.map((producto) => (
+              <Dropdown.Item key={producto.id}>
                 {producto.imagen} - {producto.nombre} - {producto.precio} 
-                <span> x {producto.cantidad}</span> {/* Mostrar cantidad */}
-                <button onClick={() => eliminarDeCesta(producto.id)} style={{ marginLeft: "10px", backgroundColor: "#e74c3c", color: "white", border: "none", padding: "5px 10px", borderRadius: "5px" }}>Eliminar</button>
+                <span> x {producto.cantidad}</span>
+                <button onClick={() => eliminarDeCarrito(producto.id)} style={{ marginLeft: "10px", backgroundColor: "#e74c3c", color: "white", border: "none", padding: "5px 10px", borderRadius: "5px" }}>Eliminar</button>
               </Dropdown.Item>
             ))
           ) : (
-            <Dropdown.Item>No hay productos en la cesta</Dropdown.Item>
+            <Dropdown.Item>No hay productos en el carrito</Dropdown.Item>
           )}
         </Dropdown.Menu>
       </Dropdown></h3>
@@ -74,18 +116,17 @@ const Producto = ({ producto, onVerDetalle }) => (
   </div>
 );
 
-const ProductoDetalle = ({ producto, añadirACesta, onCerrarDetalle }) => {
+const ProductoDetalle = ({ producto, añadirACarrito, onCerrarDetalle }) => {
   const [cantidad, setCantidad] = useState(1);
 
-  // Función para manejar el cambio de cantidad
   const handleCantidadChange = (event) => {
-    const nuevaCantidad = Math.min(event.target.value, producto.stock);  // No dejar que se elija más de lo disponible
+    const nuevaCantidad = Math.min(event.target.value, producto.stock);  
     setCantidad(nuevaCantidad);
   };
 
-  const handleAñadirACesta = () => {
+  const handleAñadirACarrito = () => {
     if (cantidad > 0) {
-      añadirACesta(producto, cantidad);
+      añadirACarrito(producto, cantidad);
     }
   };
 
@@ -107,7 +148,7 @@ const ProductoDetalle = ({ producto, añadirACesta, onCerrarDetalle }) => {
             onChange={handleCantidadChange} 
             style={{ width: '50px' }}
           />
-          <button onClick={handleAñadirACesta}>Añadir a la cesta</button>
+          <button onClick={handleAñadirACarrito}>Añadir al carrito</button>
         </div>
       </div>
       <button className="cerrar-btn" onClick={onCerrarDetalle}>Cerrar detalle</button>
@@ -117,7 +158,7 @@ const ProductoDetalle = ({ producto, añadirACesta, onCerrarDetalle }) => {
 
 export default function Home() {
   const [productos, setProductos] = useState(null);
-  const [cesta, setCesta] = useState([]);
+  const [carrito, setCarrito] = useState([]);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
   useEffect(() => {
@@ -126,48 +167,59 @@ export default function Home() {
       setProductos(productosData);
     };
 
+    const fetchCarrito = async () => {
+      const carritoData = await obtenerCarritoDelBackend();
+      setCarrito(carritoData);
+    };
+
     fetchProductos();
+    fetchCarrito();
   }, []);
 
-  const añadirACesta = (producto, cantidad) => {
-    // Verificamos si el producto ya está en la cesta
-    const productoExistente = cesta.find(item => item.id === producto.id);
+  const añadirACarrito = async (producto, cantidad) => {
+    const carritoExistente = carrito.find(c => c.id_carrito === producto.id_producto);
+    let nuevoCarrito;
 
-    if (productoExistente) {
-      // Si ya existe, actualizamos la cantidad
-      const nuevaCesta = cesta.map(item => 
-        item.id === producto.id 
-          ? { ...item, cantidad: item.cantidad + cantidad }  // Sumamos la cantidad seleccionada
+    if (carritoExistente) {
+      nuevoCarrito = carrito.map(item => 
+        item.id_carrito === producto.id_producto 
+          ? { ...item, carritoProductos: [...item.carritoProductos, { producto, cantidad }] } 
           : item
       );
-      setCesta(nuevaCesta);
     } else {
-      // Si no existe, añadimos el producto con la cantidad
-      setCesta([...cesta, { ...producto, cantidad }]);
+      nuevoCarrito = [...carrito, { 
+        id_carrito: producto.id_producto,
+        fecha_creacion: new Date(),
+        estado: "activo",
+        carritoProductos: [{ producto, cantidad }]
+      }];
     }
+
+    setCarrito(nuevoCarrito);
+    await guardarCarritoEnBackend(nuevoCarrito);
   };
 
-  const eliminarDeCesta = (productoId) => {
-    const nuevaCesta = cesta.filter((producto) => producto.id !== productoId);
-    setCesta(nuevaCesta);
+  const eliminarDeCarrito = async (productoId) => {
+    const nuevoCarrito = carrito.filter((producto) => producto.id !== productoId);
+    setCarrito(nuevoCarrito);
+    await eliminarProductoDeCarritoEnBackend(productoId);
   };
 
   const handleVerDetalle = (producto) => {
     setProductoSeleccionado(producto);
   };
 
-  // Cerrar el detalle
   const handleCerrarDetalle = () => {
     setProductoSeleccionado(null);
   };
 
   return (
     <div className="global">
-      <Navbar cesta={cesta} eliminarDeCesta={eliminarDeCesta} />
+      <Navbar carrito={carrito} eliminarDeCarrito={eliminarDeCarrito} />
       <main>
         {productoSeleccionado && (
           <section>
-            <ProductoDetalle producto={productoSeleccionado} añadirACesta={añadirACesta} onCerrarDetalle={handleCerrarDetalle} />
+            <ProductoDetalle producto={productoSeleccionado} añadirACarrito={añadirACarrito} onCerrarDetalle={handleCerrarDetalle} />
           </section>
         )}
         <section>
@@ -177,7 +229,7 @@ export default function Home() {
           <div className="products-container">
             {productos ? (
               productos.map((producto) => (
-                <Producto key={producto.id} producto={producto} onVerDetalle={handleVerDetalle} />
+                <Producto key={producto.id_producto} producto={producto} onVerDetalle={handleVerDetalle} />
               ))
             ) : (
               <p>Cargando productos...</p>

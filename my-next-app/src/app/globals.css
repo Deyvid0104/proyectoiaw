@@ -401,8 +401,8 @@ button:hover {
 }
 .producto_mod {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Crea dos columnas de igual tamaño */
-  gap: 20px; /* Espacio entre los elementos */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px; 
   padding: 20px;
   max-width: 800px;
   margin: 0 auto;
@@ -439,4 +439,38 @@ button:hover {
 
 .input_img_mod{
   width: 400px;
+}
+
+.producto_create {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px; 
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.producto_create label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 16px;
+  color: #333;
+}
+
+.producto_create input,
+.producto_create textarea {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.producto_create input:focus,
+.producto_create textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
 }

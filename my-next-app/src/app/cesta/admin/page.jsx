@@ -1,13 +1,11 @@
-'use client'; // Esto convierte el componente en un cliente
+'use client';
 import { useEffect, useState } from "react";
 import { FaEuroSign } from "react-icons/fa";
 import { IoPersonCircle } from "react-icons/io5";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Carrusel from "../../carrusel/page";
 import Link from "next/link";
 import "../../globals.css";
 
-// Función para obtener productos
 async function getProductos() {
   try {
     const res = await fetch("http://143.47.56.237:3000/productos");
@@ -21,8 +19,7 @@ async function getProductos() {
   }
 }
 
-// Función para modificar producto
-async function modificarProducto(producto) {
+async function modificarProductoAPI(producto) {
   try {
     const res = await fetch(`http://143.47.56.237:3000/productos/${producto.id}`, {
       method: "PUT",
@@ -41,6 +38,25 @@ async function modificarProducto(producto) {
   }
 }
 
+async function agregarProducto(producto) {
+  try {
+    const res = await fetch("http://143.47.56.237:3000/productos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(producto),
+    });
+    if (!res.ok) {
+      throw new Error("Error al añadir el producto");
+    }
+    return await res.json();
+  } catch (error) {
+    console.error("Error al añadir el producto:", error);
+    return null;
+  }
+}
+
 const Navbar = () => (
   <header>
     <div className="head">
@@ -52,7 +68,6 @@ const Navbar = () => (
   </header>
 );
 
-// Producto (vista previa)
 const Producto = ({ producto, onVerDetalle, onEliminarProducto }) => (
   <div className="div_producto" key={producto.id}>
     <img className="producto-imagen" src={producto?.imagen} alt={producto?.nombre || "Imagen del producto"} />
@@ -60,36 +75,37 @@ const Producto = ({ producto, onVerDetalle, onEliminarProducto }) => (
     <p className="producto-descripcion">{producto?.descripcion}</p>
     <p className="producto-precio">{producto?.precio} <FaEuroSign /></p>
     <button className="mod_but" onClick={() => onVerDetalle(producto)}>Modificar</button>
-    <button onClick={() => onEliminarProducto(producto.id)} className="cerrar-btn">
+    <button onClick={() => onEliminarProducto(producto.id_producto)} className="cerrar-btn">
       Eliminar
     </button>
   </div>
 );
+
 
 const ProductoDetalle = ({ producto, onCerrarDetalle, onModificarProducto }) => {
   const [nombre, setNombre] = useState(producto.nombre);
   const [descripcion, setDescripcion] = useState(producto.descripcion);
   const [precio, setPrecio] = useState(producto.precio);
   const [stock, setStock] = useState(producto.stock);
-  const [imagen, setImagen] = useState(null); // Estado para manejar la imagen cargada
-  const [marca, setMarca] = useState(producto.marca || ""); // Estado para manejar la marca
-  const [modelo, setModelo] = useState(producto.modelo || ""); // Estado para manejar el modelo
+  const [imagen, setImagen] = useState(null); 
+  const [marca, setMarca] = useState(producto.marca || ""); 
+  const [modelo, setModelo] = useState(producto.modelo || "");
 
   const handleNombreChange = (event) => setNombre(event.target.value);
   const handleDescripcionChange = (event) => setDescripcion(event.target.value);
   const handlePrecioChange = (event) => setPrecio(event.target.value);
   const handleStockChange = (event) => setStock(event.target.value);
-  const handleMarcaChange = (event) => setMarca(event.target.value); // Función para actualizar la marca
-  const handleModeloChange = (event) => setModelo(event.target.value); // Función para actualizar el modelo
+  const handleMarcaChange = (event) => setMarca(event.target.value);
+  const handleModeloChange = (event) => setModelo(event.target.value);
 
   const handleImagenChange = (event) => {
     const archivo = event.target.files[0];
     if (archivo) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagen(reader.result); // Guardar la imagen en base64 para previsualización
+        setImagen(reader.result);
       };
-      reader.readAsDataURL(archivo); // Leer el archivo como base64
+      reader.readAsDataURL(archivo);
     }
   };
 
@@ -98,7 +114,6 @@ const ProductoDetalle = ({ producto, onCerrarDetalle, onModificarProducto }) => 
     const productoActualizado = await onModificarProducto(productoModificado);
 
     if (productoActualizado) {
-      // Si la actualización fue exitosa, cerramos el detalle
       onCerrarDetalle();
     }
   };
@@ -177,6 +192,16 @@ const ProductoDetalle = ({ producto, onCerrarDetalle, onModificarProducto }) => 
 export default function Home() {
   const [productos, setProductos] = useState(null);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [nuevoProducto, setNuevoProducto] = useState({
+    nombre: '',
+    descripcion: '',
+    precio: '',
+    stock: '',
+    imagen: null,
+    marca: '',
+    modelo: ''
+  });
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -187,28 +212,39 @@ export default function Home() {
     fetchProductos();
   }, []);
 
-  const eliminarProducto = async (productoId) => {
-    const res = await fetch(`http://143.47.56.237:3000/productos/${productoId}`, {
-      method: "DELETE",
-    });
-
-    if (res.ok) {
-      setProductos(productos.filter((producto) => producto.id !== productoId));
-    }
-  };
 
   const modificarProducto = async (productoModificado) => {
-    const productoActualizado = await modificarProducto(productoModificado);
-
+    const productoActualizado = await modificarProductoAPI(productoModificado);
     if (productoActualizado) {
-      // Si la actualización fue exitosa, actualizamos el estado
       setProductos(productos.map((producto) =>
-        producto.id === productoModificado.id ? productoModificado : producto
+        producto.id_producto === productoModificado.id_producto ? productoModificado : producto
       ));
     }
-    return productoModificado; // Retornar el producto actualizado
+    return productoModificado;
   };
 
+  const agregarNuevoProducto = async () => {
+    const producto = { ...nuevoProducto };
+    const nuevoProductoAgregado = await agregarProducto(producto);
+    if (nuevoProductoAgregado) {
+      setProductos([...productos, nuevoProductoAgregado]);
+      setMostrarFormulario(false);
+      setNuevoProducto({
+        nombre: '',
+        descripcion: '',
+        precio: '',
+        stock: '',
+        imagen: null,
+        marca: '',
+        modelo: ''
+      });
+    }
+  };
+  
+  async function deleteproducto(id_producto) { 
+    const token = localStorage.getItem("token")
+    if (!token) throw new Error("No token found")
+    }
   const handleVerDetalle = (producto) => {
     setProductoSeleccionado(producto);
   };
@@ -216,6 +252,39 @@ export default function Home() {
   const handleCerrarDetalle = () => {
     setProductoSeleccionado(null);
   };
+
+  const handleMostrarFormulario = () => {
+    setMostrarFormulario(true);
+  };
+
+  const handleCancelarFormulario = () => {
+    setMostrarFormulario(false);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNuevoProducto({ ...nuevoProducto, [name]: value });
+  };
+
+  const handleImagenChange = (e) => {
+    const archivo = e.target.files[0];
+    if (archivo) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNuevoProducto({ ...nuevoProducto, imagen: reader.result });
+      };
+      reader.readAsDataURL(archivo); 
+    }
+  };
+  const handleDeleteproducto = async (id) => {
+    try {
+      await deleteproducto(id)
+      const updatedproductos = await getProductos()
+      setLibros(updatedproductos)
+    } catch (error) {
+      console.error("Error deleting producto:", error)
+    }
+  }
 
   return (
     <div className="global">
@@ -231,13 +300,90 @@ export default function Home() {
           </section>
         )}
         <section>
-          <div className="divC">
-            <Carrusel />
+          <div className="divC">        
+            <button onClick={handleMostrarFormulario} className="btn btn-primary">
+              Añadir Producto
+            </button>
+            <div className="producto_create">
+            {mostrarFormulario && (
+              <div className="formulario-producto">
+                <h2>Añadir Producto</h2>
+                <div>
+                  <label>Nombre:</label>
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={nuevoProducto.nombre}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Descripción:</label>
+                  <textarea
+                    name="descripcion"
+                    value={nuevoProducto.descripcion}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Precio:</label>
+                  <input type="number"
+                    name="precio"
+                    value={nuevoProducto.precio}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Stock:</label>
+                  <input
+                    type="number"
+                    name="stock"
+                    value={nuevoProducto.stock}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Marca:</label>
+                  <input
+                    type="text"
+                    name="marca"
+                    value={nuevoProducto.marca}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Modelo:</label>
+                  <input
+                    type="text"
+                    name="modelo"
+                    value={nuevoProducto.modelo}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Imagen del producto:</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImagenChange}
+                  />
+                  {nuevoProducto.imagen && <img src={nuevoProducto.imagen} alt="Previsualización" style={{ marginTop: '10px', width: '100px' }} />}
+                </div>
+                <button onClick={agregarNuevoProducto} className="btn btn-success">
+                  Guardar Producto
+                </button>
+                <button onClick={handleCancelarFormulario} className="btn btn-secondary">
+                  Cancelar
+                </button>
+              </div>
+            )}
+            </div>
           </div>
           <div className="products-container">
             {productos ? (
               productos.map((producto) => (
-                <Producto key={producto.id} producto={producto} onVerDetalle={handleVerDetalle} onEliminarProducto={eliminarProducto} />
+                <Producto key={producto.id_producto} producto={producto} 
+                onVerDetalle={handleVerDetalle} onEliminarProducto={handleDeleteproducto} />
               ))
             ) : (
               <p>Cargando productos...</p>

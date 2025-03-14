@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useState } from 'react';
 import './estilo.css';
 import Card from 'react-bootstrap/Card';
@@ -9,32 +9,37 @@ export default function Page() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
-    // Realizamos la solicitud POST al backend de NestJS
-    const response = await fetch('http://143.47.56.237:3000/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
+    try {
+      const response = await fetch('http://143.47.56.237:3000/usuarios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-    const data = await response.json();
-    
-    // Si el mensaje de la respuesta es 'Login exitoso'
-    if (data.message === 'Login exitoso') {
-      // Aquí puedes almacenar un token JWT en el localStorage si lo necesitas
-      localStorage.setItem('user', JSON.stringify(data.user));
-
-      if (data.user.role === 'admin') {
-        window.location.href = '../cesta/admin'; // Redirigir a la página de admin
-      } else if (data.user.role === 'usuario') {
-        window.location.href = '../cesta/usuario'; // Redirigir a la página de usuario
+      if (!response.ok) {
+        throw new Error('Error en la solicitud');
       }
-    } else {
-      setErrorMessage(data.message); // Mostrar el mensaje de error si el login falla
+
+      const data = await response.json();
+      if (data.message === 'Login exitoso') {
+        localStorage.setItem('user', JSON.stringify(data.usuarios));
+
+        if (data.usuarios.role === 'admin') {
+          window.location.href = '../cesta/admin';
+        } else if (data.usuarios.role === 'usuario') {
+          window.location.href = '../cesta/usuario';
+        }
+      } else {
+        setErrorMessage(data.message);
+      }
+    } catch (error) {
+      console.error('Error al realizar el login:', error);
+      setErrorMessage('Hubo un error al intentar iniciar sesión');
     }
   };
 
@@ -44,7 +49,7 @@ export default function Page() {
         <Card>
           <h1 className='h1_login'>Iniciar Sesión</h1>
           <input
-            type="text"
+            type="email" 
             id="texto"
             name="texto"
             placeholder="Email"
@@ -62,7 +67,7 @@ export default function Page() {
           {errorMessage && <p className="error">{errorMessage}</p>}
           <p></p>
           <button className='but_login' onClick={handleLogin}>Login</button>
-          <a href='/'><button className='but_volver' >Volver</button></a>
+          <a href='/'><button className='but_volver'>Volver</button></a>
         </Card>
       </div>
     </div>
