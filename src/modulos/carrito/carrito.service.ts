@@ -2,10 +2,11 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Carrito } from './entities/carrito.entity';
-import { CarritoProducto } from '../carrito-producto/entities/carrito-producto.entity'; // Importar la entidad CarritoProducto
+import { CarritoProducto } from '../carrito-producto/entities/carrito-producto.entity';
 import { ProductoService } from '../productos/productos.service';
 import { CreateCarritoDto } from './dto/create-carrito.dto';
 import { UpdateCarritoDto } from './dto/update-carrito.dto';
+import { Usuario } from '../usuarios/entities/usuarios.entity';
 
 @Injectable()
 export class CarritoService {
@@ -13,7 +14,7 @@ export class CarritoService {
     @InjectRepository(Carrito)
     private carritoRepository: Repository<Carrito>,
 
-    @InjectRepository(CarritoProducto) // Inyectar el repositorio de CarritoProducto
+    @InjectRepository(CarritoProducto)
     private carritoProductoRepository: Repository<CarritoProducto>,
 
     private productoService: ProductoService,
@@ -31,7 +32,7 @@ export class CarritoService {
   async findOne(id: number): Promise<any> {
     const carrito = await this.carritoRepository.findOne({
       where: { id_carrito: id },
-      relations: ['carritoProductos', 'carritoProductos.producto'], // Cargar relaciones
+      relations: ['carritoProductos', 'carritoProductos.producto', 'usuario'], // Cargar relaciones
     });
 
     if (!carrito) {
@@ -65,6 +66,7 @@ export class CarritoService {
     id_carrito: number;
     fecha_creacion: Date;
     estado: string;
+    usuario: Usuario; // Incluir el usuario en la respuesta
     carritoProductos: {
       id: number;
       cantidad: number;
@@ -75,7 +77,7 @@ export class CarritoService {
         precio: number;
         stock: number;
       };
-      subtotal: number; // Incluir el subtotal
+      subtotal: number;
     }[];
   }> {
     const carrito = await this.findOne(idCarrito);
@@ -106,6 +108,7 @@ export class CarritoService {
       id_carrito: carritoActualizado.id_carrito,
       fecha_creacion: carritoActualizado.fecha_creacion,
       estado: carritoActualizado.estado,
+      usuario: carritoActualizado.usuario, // Incluir el usuario en la respuesta
       carritoProductos: carritoActualizado.carritoProductos.map((cp) => ({
         id: cp.id,
         cantidad: cp.cantidad,
@@ -116,7 +119,7 @@ export class CarritoService {
           precio: cp.producto.precio,
           stock: cp.producto.stock,
         },
-        subtotal: cp.producto.precio * cp.cantidad, // Calcular el subtotal
+        subtotal: cp.producto.precio * cp.cantidad,
       })),
     };
   }
@@ -137,7 +140,7 @@ export class CarritoService {
       await this.carritoProductoRepository.remove(carritoProducto);
     }
 
-    return this.findOne(idCarrito); // Retornar el carrito actualizado
+    return this.findOne(idCarrito);
   }
 
   async listarProductos(idCarrito: number): Promise<{ producto: any; cantidad: number; precio: number; subtotal: number }[]> {
@@ -148,21 +151,21 @@ export class CarritoService {
     }
 
     return carrito.carritoProductos.map((cp) => {
-      const producto = cp.producto; // Obtener el producto directamente desde la relación
+      const producto = cp.producto;
       const cantidad = cp.cantidad;
-      const precio = producto.precio; // Obtener el precio del producto
-      const subtotal = precio * cantidad; // Calcular el subtotal
+      const precio = producto.precio;
+      const subtotal = precio * cantidad;
 
       return {
         producto: {
           id_producto: producto.id_producto,
           nombre: producto.nombre,
           descripcion: producto.descripcion,
-          precio: producto.precio, // Incluir el precio en la respuesta
+          precio: producto.precio,
         },
         cantidad,
-        precio, // Incluir el precio en la respuesta
-        subtotal, // Incluir el subtotal en la respuesta
+        precio,
+        subtotal,
       };
     });
   }
@@ -181,9 +184,9 @@ export class CarritoService {
 
     if (carritoProducto) {
       carritoProducto.cantidad = cantidad;
-      await this.carritoProductoRepository.save(carritoProducto); // Guardar los cambios
+      await this.carritoProductoRepository.save(carritoProducto);
     }
 
-    return this.findOne(idCarrito); // Retornar el carrito actualizado
+    return this.findOne(idCarrito);
   }
 }

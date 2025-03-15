@@ -32,7 +32,6 @@ export class Usuario {
   rol: string;
 
   @OneToOne(() => Carrito, (carrito) => carrito.usuario)
-  @JoinColumn({ name: 'id_carrito' })
   carrito: Carrito;
 
   @OneToMany(() => Pedido, (pedido) => pedido.usuario)
