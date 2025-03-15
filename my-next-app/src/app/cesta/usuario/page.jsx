@@ -24,7 +24,7 @@ async function getProductos() {
 
 async function eliminarProductoDeCarritoEnBackend(productoId) {
   try {
-    const res = await fetch(`http://143.47.56.237:3000/carrito/${productoId}`, {
+    const res = await fetch(`http://143.47.56.237:3000/carritos/${productoId}`, { 
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
