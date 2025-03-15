@@ -151,6 +151,18 @@ export default function Home() {
     fetchProductos();
   }, []);
 
+  const añadirACarrito = (producto) => {
+    setCarrito([...carrito, { ...producto,}]);
+
+    fetch(`http://143.47.56.237:3000/carritos`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id_producto: producto.id_producto}),
+    }).catch((error) => console.error('Error al añadir al carrito', error));
+  };
+
   const eliminarDeCarrito = async (productoId) => {
     const idCarrito = 6; // Este valor debe coincidir con el id correcto del carrito
   
