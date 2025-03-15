@@ -151,34 +151,6 @@ export default function Home() {
     fetchProductos();
   }, []);
 
-  const añadirACarrito = (producto) => {
-    setCarrito([...carrito, { ...producto,}]);
-
-    fetch(`http://143.47.56.237:3000/carritos`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id_producto: producto.id_producto}),
-    }).catch((error) => console.error('Error al añadir al carrito', error));
-  };
-
-  const eliminarDeCarrito = async (productoId) => {
-    const idCarrito = 6; // Este valor debe coincidir con el id correcto del carrito
-  
-    console.log(`Eliminando producto con ID ${productoId} del carrito con ID ${idCarrito}`);
-  
-    const response = await eliminarProductoDeCarritoEnBackend(idCarrito, productoId);
-  
-    if (response?.success) {
-      const nuevoCarrito = carrito.filter((producto) => producto.id !== productoId);
-      setCarrito(nuevoCarrito);
-      alert('Producto eliminado del carrito');
-    } else {
-      alert('Hubo un error al eliminar el producto');
-    }
-  };
-
   const handleVerDetalle = (producto) => {
     setProductoSeleccionado(producto);
   };
