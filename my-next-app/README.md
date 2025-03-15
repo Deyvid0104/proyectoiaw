@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# TechStore - Tienda de Productos Tecnológicos
 
-## Getting Started
+## Descripción
+TechStore es una tienda en línea especializada en productos tecnológicos, incluyendo portátiles gaming, componentes de PC, periféricos y más.
 
-First, run the development server:
+## Características
+- Catálogo de productos por categorías
+- Carrusel de productos destacados
+- Sistema de autenticación (login/registro)
+- Panel de administración
+- Carrito de compras
+- Diseño responsive
 
+## Tecnologías Utilizadas
+- Next.js 13
+- React
+- Bootstrap
+- React Bootstrap
+- Tailwind CSS
+- CSS Modules
+
+## Instalación
+
+1. Clonar el repositorio:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Deyvid0104/proyectoiaw.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Instalar dependencias:
+```bash
+cd proyectoiaw
+npm install
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. Iniciar el servidor de desarrollo:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Abrir [http://localhost:3000] en el navegador.
 
-## Learn More
+## Equipo de Desarrollo
+- Deyvid Rios
+- Fabio Fabrega
+- Kevin Acuña
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Licencia
+Este proyecto está bajo la Licencia IAW.
