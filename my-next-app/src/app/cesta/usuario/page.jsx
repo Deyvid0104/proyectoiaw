@@ -24,6 +24,8 @@ async function getProductos() {
 
 async function eliminarProductoDeCarritoEnBackend(productoId) {
   try {
+    /*colocar :id/productos/:idProducto'*/
+    /*posible modificacion y falo al eliminar porducto , que no se refleje en la base de datos*/
     const res = await fetch(`http://143.47.56.237:3000/carritos/${productoId}`, { 
       method: "DELETE",
       headers: {
@@ -139,12 +141,26 @@ export default function Home() {
   const añadirACarrito = (producto) => {
     setCarrito([...carrito, { ...producto,}]);
 /*posible error en la url para añadir productos al carrito */
+    /*carritos/id/productos/id*/
+
+    /*controler de carritos 
+
+     @Post(':id/productos/:idProducto')
+  agregarProducto(
+    @Param('id') idCarrito: string,
+    @Param('idProducto') idProducto: string,
+    @Body('cantidad') cantidad: number,
+  ) {
+    return this.carritoService.agregarProducto(+idCarrito, +idProducto, cantidad);
+  }
+  */
     fetch(`http://143.47.56.237:3000/carritos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ id_producto: producto.id_producto}),
+      /*solo es necesario usar la cantidad*/
     }).catch((error) => console.error('Error al añadir al carrito', error));
   };
 
