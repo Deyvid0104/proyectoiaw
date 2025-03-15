@@ -91,11 +91,9 @@ const Producto = ({ producto, onEliminar, onEditar }) => (
 const AñadirProductoForm = ({ onProductoCreado, onCerrarFormulario }) => {
   const [nombre, setNombre] = useState('');
   const [precio, setPrecio] = useState('');
-  const [idCategoria, setIdCategoria] = useState('');
+  const [stock, setstock] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [imagen, setImagen] = useState('');
-  const [marca, setMarca] = useState(''); // Nuevo campo Marca
-  const [modelo, setModelo] = useState(''); // Nuevo campo Modelo
   const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
@@ -107,7 +105,7 @@ const AñadirProductoForm = ({ onProductoCreado, onCerrarFormulario }) => {
       return;
     }
 
-    const productoData = { nombre, precio, id_categoria: idCategoria, descripcion, imagen, marca, modelo }; // Incluimos los nuevos campos
+    const productoData = { nombre, precio,stock, descripcion, imagen }; // Incluimos los nuevos campos
     try {
       const producto = await createProducto(productoData, token);
       onProductoCreado(producto);
@@ -130,8 +128,8 @@ const AñadirProductoForm = ({ onProductoCreado, onCerrarFormulario }) => {
         <input type="number" value={precio} onChange={(e) => setPrecio(e.target.value)} required />
       </div>
       <div>
-        <label>ID Categoría:</label>
-        <input type="text" value={idCategoria} onChange={(e) => setIdCategoria(e.target.value)} required />
+        <label>Cantidad:</label>
+        <input type="text" value={stock} onChange={(e) => setstock(e.target.value)} required />
       </div>
       <div>
         <label>Descripción:</label>
@@ -141,15 +139,6 @@ const AñadirProductoForm = ({ onProductoCreado, onCerrarFormulario }) => {
         <label>Imagen URL:</label>
         <input type="text" value={imagen} onChange={(e) => setImagen(e.target.value)} />
       </div>
-      <div>
-        <label>Marca:</label>
-        <input type="text" value={marca} onChange={(e) => setMarca(e.target.value)} required />
-      </div>
-      <div>
-        <label>Modelo:</label>
-        <input type="text" value={modelo} onChange={(e) => setModelo(e.target.value)} required />
-      </div>
-
       <button className="btn-crear" type="submit">Crear Producto</button>
       {error && <p style={{ color: 'red' }}>{error}</p>}
     </form>
@@ -160,6 +149,7 @@ const EditarProductoForm = ({ producto, onProductoEditado, onCerrarFormulario })
   const [nombre, setNombre] = useState(producto?.nombre || '');
   const [precio, setPrecio] = useState(producto?.precio || '');
   const [idCategoria, setIdCategoria] = useState(producto?.id_categoria || '');
+  const [stock, setstock] = useState('');
   const [descripcion, setDescripcion] = useState(producto?.descripcion || '');
   const [imagen, setImagen] = useState(producto?.imagen || '');
   const [marca, setMarca] = useState(producto?.marca || '');
@@ -198,8 +188,8 @@ const EditarProductoForm = ({ producto, onProductoEditado, onCerrarFormulario })
         <input type="number" value={precio} onChange={(e) => setPrecio(e.target.value)} required />
       </div>
       <div>
-        <label>ID Categoría:</label>
-        <input type="text" value={idCategoria} onChange={(e) => setIdCategoria(e.target.value)} required />
+        <label>Cantidad:</label>
+        <input type="text" value={stock} onChange={(e) => setstock(e.target.value)} required />
       </div>
       <div>
         <label>Descripción:</label>
@@ -211,11 +201,11 @@ const EditarProductoForm = ({ producto, onProductoEditado, onCerrarFormulario })
       </div>
       <div>
         <label>Marca:</label>
-        <input type="text" value={marca} onChange={(e) => setMarca(e.target.value)} required />
+        <input type="text" value={marca} onChange={(e) => setMarca(e.target.value)}  />
       </div>
       <div>
         <label>Modelo:</label>
-        <input type="text" value={modelo} onChange={(e) => setModelo(e.target.value)} required />
+        <input type="text" value={modelo} onChange={(e) => setModelo(e.target.value)} />
       </div>
       <div className="form-buttons">
         <button className="btn-crear" type="submit">Guardar Cambios</button>
