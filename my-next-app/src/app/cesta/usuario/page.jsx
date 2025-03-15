@@ -138,7 +138,7 @@ export default function Home() {
 
   const añadirACarrito = (producto) => {
     setCarrito([...carrito, { ...producto,}]);
-
+/*posible error en la url para añadir productos al carrito */
     fetch(`http://143.47.56.237:3000/carritos`, {
       method: 'POST',
       headers: {
