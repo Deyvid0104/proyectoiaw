@@ -28,7 +28,7 @@ git clone https://github.com/Deyvid0104/proyectoiaw.git
 
 2. Instalar dependencias:
 ```bash
-cd proyectoiaw
+cd my-next-app
 npm install
 ```
 

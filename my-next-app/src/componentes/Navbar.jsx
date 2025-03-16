@@ -36,14 +36,14 @@ export default function NavbarComponent({ userType = 'guest', onSearch, onClearS
       email: 'fabio@example.com'
     },
     Deyvid: {
-      name: 'Deyvid',
-      role: 'Desarrollador Backend',
-      image: 'https://via.placeholder.com/300',
-      bio: 'Experto en desarrollo backend y bases de datos. Enfocado en crear APIs robustas y eficientes para aplicaciones web.',
-      skills: ['Node.js', 'Express', 'MongoDB', 'SQL', 'API REST'],
-      github: 'https://github.com/deyvid',
-      linkedin: 'https://linkedin.com/in/deyvid',
-      email: 'deyvid@example.com'
+      name: 'Deyvid Rios',
+      role: 'Desarrollador Full Stack',
+      image: 'https://img.freepik.com/vector-gratis/ilustracion-joven-sonriente_1308-174669.jpg',
+      bio: 'Apasionado por la administración de sistemas y la seguridad informática. Enfocado en optimizar infraestructuras de TI y garantizar la protección de datos en entornos empresariales.',
+      skills: ['Node.js', 'Express', 'SQL', 'API REST', 'AWS', 'Docker'],
+      github: 'https://github.com/Deyvid0104',
+      linkedin: 'https://linkedin.com/in/deyvid-rios-634569168',
+      email: 'deyvidriost@gmail.com'
     },
     Kevin: {
       name: 'Kevin',
