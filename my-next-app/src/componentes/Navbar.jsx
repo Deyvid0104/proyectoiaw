@@ -28,12 +28,12 @@ export default function NavbarComponent({ userType = 'guest', onSearch, onClearS
     Fabio: {
       name: 'Fabio',
       role: 'Desarrollador Frontend',
-      image: 'https://via.placeholder.com/300',
+      image: 'https://img.freepik.com/vector-gratis/nino-sonriente-cabello-oscuro_1308-174422.jpg?t=st=1742123183~exp=1742126783~hmac=7c092fc8ac9bd9a23af40a96dab6e3b88a28498bb4360341f970a88a94471d9c&w=740',
       bio: 'Especialista en desarrollo frontend con experiencia en React y Next.js. Apasionado por crear interfaces de usuario intuitivas y atractivas.',
       skills: ['React', 'Next.js', 'JavaScript', 'CSS', 'Bootstrap'],
-      github: 'https://github.com/fabio',
+      github: 'https://github.com/FabioFabrega',
       linkedin: 'https://linkedin.com/in/fabio',
-      email: 'fabio@example.com'
+      email: 'fabiofabrega746@gmail.com'
     },
     Deyvid: {
       name: 'Deyvid Rios',
